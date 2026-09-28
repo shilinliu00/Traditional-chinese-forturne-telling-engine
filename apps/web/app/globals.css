@@ -1,0 +1,214 @@
+:root {
+  --bg: #faf7f0;
+  --ink: #2b2620;
+  --muted: #8a8073;
+  --card: #ffffff;
+  --line: #e8e0d2;
+  --accent: #b3541e;
+  --accent-soft: #f7e8d8;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: "Noto Sans", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+  line-height: 1.6;
+}
+
+main {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 2rem 1.25rem 4rem;
+}
+
+h1 {
+  font-size: 1.75rem;
+  margin: 0 0 0.25rem;
+  letter-spacing: 0.02em;
+}
+
+.subtitle {
+  color: var(--muted);
+  margin: 0 0 2rem;
+}
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 1.25rem;
+  box-shadow: 0 1px 3px rgba(60, 45, 25, 0.06);
+}
+
+.card h2 {
+  font-size: 1.05rem;
+  margin: 0 0 1rem;
+  font-weight: 600;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 0.9rem 1rem;
+}
+
+.field label {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--muted);
+  margin-bottom: 0.3rem;
+}
+
+.field input,
+.field select {
+  width: 100%;
+  padding: 0.55rem 0.65rem;
+  font-size: 0.95rem;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+  color: var(--ink);
+}
+
+.radio-row {
+  display: flex;
+  gap: 1.25rem;
+  padding-top: 1.6rem;
+}
+
+.radio-row label {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+
+button.primary {
+  margin-top: 1.1rem;
+  padding: 0.7rem 2rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #fff;
+  background: var(--accent);
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+button.primary:hover { filter: brightness(1.08); }
+
+.pillars {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.9rem;
+}
+
+@media (max-width: 640px) {
+  .pillars { grid-template-columns: repeat(2, 1fr); }
+}
+
+.pillar {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 0.9rem 0.5rem;
+  text-align: center;
+  background: #fffdf8;
+}
+
+.pillar.daymaster {
+  border: 2px solid var(--accent);
+  background: var(--accent-soft);
+}
+
+.pillar .pname {
+  font-size: 0.75rem;
+  color: var(--muted);
+  margin-bottom: 0.35rem;
+}
+
+.pillar .hanzi {
+  font-size: 2rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  line-height: 1.3;
+}
+
+.pillar .pinyin {
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+.pillar .god {
+  margin-top: 0.4rem;
+  font-size: 0.85rem;
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.hidden-stems {
+  margin-top: 0.6rem;
+  padding-top: 0.6rem;
+  border-top: 1px dashed var(--line);
+  font-size: 0.8rem;
+  color: var(--muted);
+  line-height: 1.9;
+}
+
+.hidden-stems b {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.element-bar {
+  display: flex;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  margin-top: 0.5rem;
+}
+
+.element-chip {
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 0.25rem 0.85rem;
+  font-size: 0.85rem;
+  background: #fffdf8;
+}
+
+.luck-list {
+  display: flex;
+  gap: 0.6rem;
+  overflow-x: auto;
+  padding-bottom: 0.4rem;
+}
+
+.luck-item {
+  flex: 0 0 auto;
+  min-width: 92px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 0.6rem 0.4rem;
+  text-align: center;
+  background: #fffdf8;
+}
+
+.luck-item .hanzi { font-size: 1.35rem; font-weight: 700; }
+.luck-item .age { font-size: 0.75rem; color: var(--muted); margin-top: 0.2rem; }
+.luck-item.current { border-color: var(--accent); background: var(--accent-soft); }
+
+.meta {
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+
+.note {
+  font-size: 0.82rem;
+  color: var(--muted);
+  border-left: 3px solid var(--line);
+  padding-left: 0.8rem;
+  margin-top: 1.5rem;
+}

@@ -1,0 +1,1 @@
+{"description":"BaZi chart calculation engine — stems, branches, pillars, ten gods","exports":{".":"./src/index.ts"},"name":"@bazi/engine","type":"module","version":"0.1.0"}

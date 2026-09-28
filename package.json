@@ -1,0 +1,13 @@
+{
+  "description": "BaZi (Four Pillars of Destiny) calculator and interpreter",
+  "name": "bazi-calculator",
+  "private": true,
+  "scripts": {
+    "test": "node --test \"packages/engine/tests/*.test.ts\""
+  },
+  "version": "0.1.0",
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ]
+}
