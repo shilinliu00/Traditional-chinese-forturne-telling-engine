@@ -59,16 +59,29 @@ export function makePillar(stem: number, branch: number): Pillar {
   return { stem, branch, hanzi: STEMS[stem].hanzi + BRANCHES[branch].hanzi };
 }
 
+function daysInMonth(y: number, m: number): number {
+  return new Date(Date.UTC(y, m, 0)).getUTCDate(); // day 0 of month m = last day of month m
+}
+
 function parseDate(date: string): { y: number; m: number; d: number } {
-  const [y, m, d] = date.split('-').map(Number);
-  if (!y || !m || !d) throw new Error(`Invalid date '${date}', expected YYYY-MM-DD.`);
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(date);
+  if (!match) throw new Error(`Invalid date '${date}', expected YYYY-MM-DD.`);
+  const y = Number(match[1]);
+  const m = Number(match[2]);
+  const d = Number(match[3]);
+  if (m < 1 || m > 12 || d < 1 || d > daysInMonth(y, m)) {
+    throw new Error(`Invalid date '${date}': not a real calendar date.`);
+  }
   return { y, m, d };
 }
 
 function parseTime(time: string): { hh: number; mm: number } {
-  const [hh, mm] = time.split(':').map(Number);
-  if (hh === undefined || mm === undefined || Number.isNaN(hh) || Number.isNaN(mm)) {
-    throw new Error(`Invalid time '${time}', expected HH:mm.`);
+  const match = /^(\d{2}):(\d{2})$/.exec(time);
+  if (!match) throw new Error(`Invalid time '${time}', expected HH:mm.`);
+  const hh = Number(match[1]);
+  const mm = Number(match[2]);
+  if (hh > 23 || mm > 59) {
+    throw new Error(`Invalid time '${time}': hour must be 00-23 and minute 00-59.`);
   }
   return { hh, mm };
 }

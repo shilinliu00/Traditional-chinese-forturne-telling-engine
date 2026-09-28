@@ -77,3 +77,24 @@ describe('ten gods', () => {
     }
   });
 });
+
+describe('input validation', () => {
+  it('rejects impossible calendar dates', () => {
+    for (const date of ['2024-13-01', '2024-00-10', '2023-02-29', '2024-02-30', '2024-04-31']) {
+      assert.throws(() => calculateBaZi({ date, time: '12:00' }), /Invalid date/);
+    }
+  });
+
+  it('rejects malformed date/time strings', () => {
+    assert.throws(() => calculateBaZi({ date: '2024-1-1', time: '12:00' }), /Invalid date/);
+    assert.throws(() => calculateBaZi({ date: 'not-a-date', time: '12:00' }), /Invalid date/);
+    assert.throws(() => calculateBaZi({ date: '2024-01-01', time: '9:00' }), /Invalid time/);
+    assert.throws(() => calculateBaZi({ date: '2024-01-01', time: '25:00' }), /Invalid time/);
+    assert.throws(() => calculateBaZi({ date: '2024-01-01', time: '12:60' }), /Invalid time/);
+  });
+
+  it('accepts Feb 29 on leap years', () => {
+    const c = calculateBaZi({ date: '2024-02-29', time: '12:00' });
+    assert.equal(c.day.hanzi, '癸亥');
+  });
+});
