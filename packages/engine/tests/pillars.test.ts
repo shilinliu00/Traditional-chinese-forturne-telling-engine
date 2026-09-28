@@ -98,3 +98,17 @@ describe('input validation', () => {
     assert.equal(c.day.hanzi, '癸亥');
   });
 });
+
+describe('chart reading', () => {
+  it('annotates each pillar stem with its ten god vs the day master', async () => {
+    const { readChart } = await import('../src/reading.ts');
+    // 2024-01-01 12:00 → 癸卯年 甲子月 甲子日 庚午时, day master 甲
+    const r = readChart({ date: '2024-01-01', time: '12:00' });
+    assert.equal(r.dayMasterHanzi, '甲');
+    assert.equal(r.year.hanzi, '癸卯');
+    assert.equal(r.year.tenGod, '正印'); // 癸水生甲木,异性 → 正印
+    assert.equal(r.day.tenGod, '比肩'); // 甲见甲 → 比肩
+    assert.equal(r.hour.hanzi, '庚午');
+    assert.equal(r.hour.tenGod, '七杀'); // 庚金克甲木,同性 → 七杀
+  });
+});
