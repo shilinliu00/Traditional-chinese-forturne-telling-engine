@@ -32,6 +32,23 @@ npm test   # node --test packages/engine/tests/*.test.ts
 
 No dependencies, no build step — Node 22+ runs the TypeScript directly via type stripping.
 
+## API usage
+
+```ts
+import { calculateBaZi, readChart, luckPillars } from './packages/engine/src/index.ts';
+
+// Four pillars (throws on impossible dates like 2023-02-29 or times like 25:00)
+const chart = calculateBaZi({ date: '2024-01-01', time: '12:00', longitude: 116 });
+// → { year: '癸卯', month: '甲子', day: '甲子', hour: '庚午', dayMaster: 0 }
+
+// Same chart with each stem's Ten God (十神) resolved against the Day Master
+const reading = readChart({ date: '2024-01-01', time: '12:00' });
+// → year: 癸卯 (正印), month: 甲子 (比肩), day: 甲子 (比肩), hour: 庚午 (七杀)
+
+// Luck pillars (大运), direction from year-stem polarity × gender
+const lucks = luckPillars({ date: '2024-01-01', time: '12:00', gender: 'male' });
+```
+
 ## Run the web app
 
 ```bash
