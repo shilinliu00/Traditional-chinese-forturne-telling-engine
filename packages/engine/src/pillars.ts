@@ -12,11 +12,12 @@
  * - Hour pillar stem via the Five Rats rule (五鼠遁): 甲/己 days start 甲子,
  *   乙/庚 → 丙子, 丙/辛 → 戊子, 丁/壬 → 庚子, 戊/癸 → 壬子.
  * - True solar time: longitude correction vs. the clock timezone's standard
- *   meridian (1° = 4 minutes). Equation of time not yet applied.
+ *   meridian (1° = 4 minutes) plus the equation of time (Meeus ch. 28,
+ *   ±16 minutes seasonal). Applied when `longitude` is given.
  * - Late 子时 rule: 23:00–24:00 solar time belongs to the *next* day.
  */
 import { STEMS, BRANCHES } from './data.ts';
-import { jieBranchAt, lichunInstant } from './solarTerms.ts';
+import { jieBranchAt, lichunInstant, equationOfTimeAt } from './solarTerms.ts';
 
 const mod = (n: number, m: number): number => ((n % m) + m) % m;
 const DAY_MS = 86_400_000;
@@ -154,9 +155,16 @@ export function calculateBaZi(input: BirthInput): BaZiChart {
   const { hh, mm } = parseTime(input.time);
   const birth = birthInstantUtc(input);
 
-  // True solar time: 1° of longitude = 4 minutes vs. the standard meridian.
+  // True solar time: 1° of longitude = 4 minutes vs. the standard meridian,
+  // plus the equation of time (seasonal, up to ±16 minutes). Only applied
+  // when the birthplace longitude is known.
   const meridian = input.meridian ?? 120;
-  const solarTotal = hh * 60 + mm + (input.longitude !== undefined ? (input.longitude - meridian) * 4 : 0);
+  const solarTotal =
+    hh * 60 +
+    mm +
+    (input.longitude !== undefined
+      ? (input.longitude - meridian) * 4 + equationOfTimeAt(birth)
+      : 0);
   const solarMinutes = mod(Math.floor(solarTotal), 1440);
 
   // Date shift: longitude correction can push across midnight, and 23:00–24:00

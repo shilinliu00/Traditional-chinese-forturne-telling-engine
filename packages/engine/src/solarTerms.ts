@@ -68,6 +68,44 @@ const APPROX_DAY_OF_YEAR = [
 const jdOfMs = (ms: number): number => ms / DAY_MS + 2440587.5;
 const msOfJd = (jd: number): number => (jd - 2440587.5) * DAY_MS;
 
+const sinDeg = (d: number): number => Math.sin(d * DEG);
+const cosDeg = (d: number): number => Math.cos(d * DEG);
+
+/**
+ * Equation of time at a Julian Day, in minutes of time.
+ *
+ * Apparent solar time = mean solar time + EoT. The seasonal ±16-minute
+ * swing comes from Earth's orbital eccentricity and axial tilt; ignoring
+ * it can put a birth near an hour-pillar boundary in the wrong 时辰.
+ *
+ * Full Meeus algorithm ("Astronomical Algorithms", ch. 28), accurate to
+ * better than 0.01 minute near the present epoch.
+ */
+export function equationOfTime(julianDay: number): number {
+  const T = (julianDay - 2451545.0) / 36525; // centuries since J2000
+  const L0 = 280.46646 + 36000.76983 * T + 0.0003032 * T * T; // mean longitude, °
+  const M = 357.52911 + 35999.05029 * T - 0.0001537 * T * T; // mean anomaly, °
+  const e = 0.016708634 - 0.000042037 * T - 0.0000001267 * T * T; // eccentricity
+  const eps =
+    23 + 26 / 60 + 21.448 / 3600 - (46.8150 / 3600) * T - (0.00059 / 3600) * T * T + (0.001813 / 3600) * T * T; // mean obliquity, °
+  const y = Math.tan(((eps / 2) * Math.PI) / 180) ** 2;
+
+  // Meeus eq. 28.3, in radians:
+  const E =
+    y * sinDeg(2 * L0) -
+    2 * e * sinDeg(M) +
+    4 * e * y * sinDeg(M) * cosDeg(2 * L0) -
+    0.5 * y * y * sinDeg(4 * L0) -
+    1.25 * e * e * sinDeg(2 * M);
+
+  return (4 * E * 180) / Math.PI; // radians → degrees → minutes of time
+}
+
+/** Equation of time in minutes at a UTC instant. */
+export function equationOfTimeAt(date: Date): number {
+  return equationOfTime(jdOfMs(date.getTime()));
+}
+
 /**
  * Apparent geocentric ecliptic longitude of the sun, in degrees [0, 360).
  * Low-precision formulation (Meeus): mean longitude + equation of center,
