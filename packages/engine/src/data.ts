@@ -41,7 +41,7 @@ export interface BranchInfo {
 
 /** The twelve Earthly Branches (地支), in order. */
 export const BRANCHES: BranchInfo[] = [
-  { index: 0,  hanzi: '子', pinyin: 'Zi',   zodiac: 'Rat',     element: 'Water', polarity: 'yin',  hiddenStems: [9] },
+  { index: 0,  hanzi: '子', pinyin: 'Zi',   zodiac: 'Rat',     element: 'Water', polarity: 'yang', hiddenStems: [9] },
   { index: 1,  hanzi: '丑', pinyin: 'Chou', zodiac: 'Ox',      element: 'Earth', polarity: 'yin',  hiddenStems: [5, 9, 7] },
   { index: 2,  hanzi: '寅', pinyin: 'Yin',  zodiac: 'Tiger',   element: 'Wood',  polarity: 'yang', hiddenStems: [0, 2, 4] },
   { index: 3,  hanzi: '卯', pinyin: 'Mao',  zodiac: 'Rabbit',  element: 'Wood',  polarity: 'yin',  hiddenStems: [1] },

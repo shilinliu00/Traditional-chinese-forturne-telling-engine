@@ -8,6 +8,7 @@ export * from './data.ts';
 export * from './cycle.ts';
 export * from './elements.ts';
 export * from './tenGods.ts';
+export * from './nayin.ts';
 export * from './solarTerms.ts';
 export * from './pillars.ts';
 export * from './luckPillars.ts';

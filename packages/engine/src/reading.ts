@@ -6,10 +6,13 @@
  */
 import { calculateBaZi, type BaZiChart, type BirthInput, type Pillar } from './pillars.ts';
 import { tenGod, type TenGod } from './tenGods.ts';
+import { nayinOf, type NaYin } from './nayin.ts';
 
 export interface PillarReading extends Pillar {
   /** Ten God (十神) of this pillar's stem relative to the Day Master. */
   tenGod: TenGod;
+  /** NaYin (纳音) of this pillar's stem-branch pair. */
+  nayin: NaYin;
 }
 
 export interface ChartReading {
@@ -24,7 +27,11 @@ export interface ChartReading {
 }
 
 function annotate(chart: BaZiChart, pillar: Pillar): PillarReading {
-  return { ...pillar, tenGod: tenGod(chart.dayMaster, pillar.stem) };
+  return {
+    ...pillar,
+    tenGod: tenGod(chart.dayMaster, pillar.stem),
+    nayin: nayinOf(pillar.stem, pillar.branch),
+  };
 }
 
 /** Full four-pillar chart with Ten Gods resolved against the Day Master. */
