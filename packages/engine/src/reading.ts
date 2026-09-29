@@ -5,6 +5,7 @@
  * `calculateBaZi` + `tenGod` themselves.
  */
 import { calculateBaZi, type BaZiChart, type BirthInput, type Pillar } from './pillars.ts';
+import { BRANCHES } from './data.ts';
 import { tenGod, type TenGod } from './tenGods.ts';
 import { nayinOf, type NaYin } from './nayin.ts';
 
@@ -13,6 +14,11 @@ export interface PillarReading extends Pillar {
   tenGod: TenGod;
   /** NaYin (纳音) of this pillar's stem-branch pair. */
   nayin: NaYin;
+  /**
+   * Ten Gods of the branch's hidden stems (藏干) vs the Day Master,
+   * main qi (本气) first.
+   */
+  hiddenGods: TenGod[];
 }
 
 export interface ChartReading {
@@ -31,6 +37,7 @@ function annotate(chart: BaZiChart, pillar: Pillar): PillarReading {
     ...pillar,
     tenGod: tenGod(chart.dayMaster, pillar.stem),
     nayin: nayinOf(pillar.stem, pillar.branch),
+    hiddenGods: BRANCHES[pillar.branch].hiddenStems.map((s) => tenGod(chart.dayMaster, s)),
   };
 }
 

@@ -111,4 +111,15 @@ describe('chart reading', () => {
     assert.equal(r.hour.hanzi, '庚午');
     assert.equal(r.hour.tenGod, '七杀'); // 庚金克甲木,同性 → 七杀
   });
+
+  it('annotates hidden stems (藏干) with ten gods vs the day master', async () => {
+    const { readChart } = await import('../src/reading.ts');
+    // 2024-01-01 12:00, day master 甲:
+    // 卯藏乙 → 劫财; 子藏癸 → 正印; 午藏丁己 → 伤官, 正财
+    const r = readChart({ date: '2024-01-01', time: '12:00' });
+    assert.deepEqual(r.year.hiddenGods, ['劫财']); // 癸卯
+    assert.deepEqual(r.month.hiddenGods, ['正印']); // 甲子
+    assert.deepEqual(r.day.hiddenGods, ['正印']); // 甲子
+    assert.deepEqual(r.hour.hiddenGods, ['伤官', '正财']); // 庚午
+  });
 });
