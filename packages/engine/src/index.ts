@@ -13,3 +13,4 @@ export * from './solarTerms.ts';
 export * from './pillars.ts';
 export * from './luckPillars.ts';
 export * from './reading.ts';
+export * from './rules.ts';
