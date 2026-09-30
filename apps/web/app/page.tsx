@@ -3,14 +3,16 @@
 import { useState } from 'react';
 import {
   calculateBaZi,
+  readChart,
   luckPillars,
   annualPillar,
   baziYearAt,
-  tenGod,
   TEN_GOD_INFO,
   STEMS,
   BRANCHES,
   type BaZiChart,
+  type ChartReading,
+  type PillarReading,
   type Gender,
   type LuckPillar,
   type Pillar,
@@ -28,22 +30,23 @@ const PILLAR_LABELS = [
   { key: 'hour', label: 'Hour 时柱' },
 ] as const;
 
-function PillarCard({ pillar, label, dayMaster, highlight }: {
-  pillar: Pillar; label: string; dayMaster: number; highlight?: boolean;
+function PillarCard({ reading, label, highlight }: {
+  reading: PillarReading; label: string; highlight?: boolean;
 }) {
-  const stem = STEMS[pillar.stem];
-  const branch = BRANCHES[pillar.branch];
-  const god = tenGod(dayMaster, pillar.stem);
+  const stem = STEMS[reading.stem];
+  const branch = BRANCHES[reading.branch];
+  const god = reading.tenGod;
   return (
     <div className={`pillar${highlight ? ' daymaster' : ''}`}>
       <div className="pname">{label}</div>
-      <div className="hanzi">{pillar.hanzi}</div>
+      <div className="hanzi">{reading.hanzi}</div>
       <div className="pinyin">{stem.pinyin} {branch.pinyin}</div>
       <div className="god">{god} · {TEN_GOD_INFO[god].english}</div>
+      <div className="nayin">纳音 {reading.nayin.name} ({ELEMENT_HANZI[reading.nayin.element]})</div>
       <div className="hidden-stems">
-        藏干 {branch.hiddenStems.map((s) => (
+        藏干 {branch.hiddenStems.map((s, i) => (
           <span key={s}>
-            <b>{STEMS[s].hanzi}</b> {tenGod(dayMaster, s)}{' '}
+            <b>{STEMS[s].hanzi}</b> {reading.hiddenGods[i]}{' '}
           </span>
         ))}
       </div>
@@ -58,7 +61,7 @@ export default function Home() {
   const [longitude, setLongitude] = useState('120');
   const [gender, setGender] = useState<Gender>('male');
   const [result, setResult] = useState<{
-    chart: BaZiChart; luck: LuckPillar[]; annual: Pillar; flowYear: number; ageYears: number;
+    chart: BaZiChart; reading: ChartReading; luck: LuckPillar[]; annual: Pillar; flowYear: number; ageYears: number;
   } | null>(null);
   const [error, setError] = useState('');
 
@@ -72,13 +75,14 @@ export default function Home() {
         utcOffsetMinutes: Number(utcOffset) * 60,
       };
       const chart: BaZiChart = calculateBaZi(input);
+      const reading: ChartReading = readChart(input);
       const luck: LuckPillar[] = luckPillars({ ...input, gender });
       const now = new Date();
       const flowYear = baziYearAt(now);
       const annual = annualPillar(flowYear);
       const ageYears = (now.getTime() - new Date(`${date}T00:00:00`).getTime()) / 31_557_600_000;
       setError('');
-      setResult({ chart, luck, annual, flowYear, ageYears });
+      setResult({ chart, reading, luck, annual, flowYear, ageYears });
     } catch (err) {
       setResult(null);
       setError(err instanceof Error ? err.message : String(err));
@@ -146,9 +150,8 @@ export default function Home() {
               {PILLAR_LABELS.map(({ key, label }) => (
                 <PillarCard
                   key={key}
-                  pillar={result.chart[key]}
+                  reading={result.reading[key]}
                   label={label}
-                  dayMaster={result.chart.dayMaster}
                   highlight={key === 'day'}
                 />
               ))}

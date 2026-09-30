@@ -150,6 +150,12 @@ button.primary:hover { filter: brightness(1.08); }
   font-weight: 600;
 }
 
+.pillar .nayin {
+  margin-top: 0.3rem;
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
 .hidden-stems {
   margin-top: 0.6rem;
   padding-top: 0.6rem;
