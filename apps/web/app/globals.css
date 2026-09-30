@@ -170,6 +170,18 @@ button.primary:hover { filter: brightness(1.08); }
   font-weight: 600;
 }
 
+.rule-list {
+  margin: 0;
+  padding-left: 1.2rem;
+  display: grid;
+  gap: 0.5rem;
+}
+
+.rule-list .meta {
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
 .element-bar {
   display: flex;
   gap: 0.6rem;

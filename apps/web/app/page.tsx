@@ -4,6 +4,7 @@ import { useState } from 'react';
 import {
   calculateBaZi,
   readChart,
+  evaluateRules,
   luckPillars,
   annualPillar,
   baziYearAt,
@@ -13,6 +14,7 @@ import {
   type BaZiChart,
   type ChartReading,
   type PillarReading,
+  type RuleHit,
   type Gender,
   type LuckPillar,
   type Pillar,
@@ -29,6 +31,33 @@ const PILLAR_LABELS = [
   { key: 'day', label: 'Day 日柱' },
   { key: 'hour', label: 'Hour 时柱' },
 ] as const;
+
+const PILLAR_ZH: Record<string, string> = {
+  year: '年柱', month: '月柱', day: '日柱', hour: '时柱',
+};
+
+function StructureCard({ hits }: { hits: RuleHit[] }) {
+  return (
+    <div className="card">
+      <h2>Chart structure 合冲</h2>
+      {hits.length === 0 ? (
+        <p className="meta">No stem combinations, branch combinations, or clashes 合/冲 found in this chart.</p>
+      ) : (
+        <ul className="rule-list">
+          {hits.map((hit, i) => (
+            <li key={i}>
+              <b>{hit.name}</b> · {hit.pattern}
+              <span className="meta">
+                {' '}({hit.pillars.map((p) => PILLAR_ZH[p]).join('、')} · {hit.factors.join('，')})
+              </span>
+              <span className="meta"> — {hit.source}</span>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+}
 
 function PillarCard({ reading, label, highlight }: {
   reading: PillarReading; label: string; highlight?: boolean;
@@ -61,7 +90,7 @@ export default function Home() {
   const [longitude, setLongitude] = useState('120');
   const [gender, setGender] = useState<Gender>('male');
   const [result, setResult] = useState<{
-    chart: BaZiChart; reading: ChartReading; luck: LuckPillar[]; annual: Pillar; flowYear: number; ageYears: number;
+    chart: BaZiChart; reading: ChartReading; structure: RuleHit[]; luck: LuckPillar[]; annual: Pillar; flowYear: number; ageYears: number;
   } | null>(null);
   const [error, setError] = useState('');
 
@@ -76,13 +105,14 @@ export default function Home() {
       };
       const chart: BaZiChart = calculateBaZi(input);
       const reading: ChartReading = readChart(input);
+      const structure: RuleHit[] = evaluateRules(chart);
       const luck: LuckPillar[] = luckPillars({ ...input, gender });
       const now = new Date();
       const flowYear = baziYearAt(now);
       const annual = annualPillar(flowYear);
       const ageYears = (now.getTime() - new Date(`${date}T00:00:00`).getTime()) / 31_557_600_000;
       setError('');
-      setResult({ chart, reading, luck, annual, flowYear, ageYears });
+      setResult({ chart, reading, structure, luck, annual, flowYear, ageYears });
     } catch (err) {
       setResult(null);
       setError(err instanceof Error ? err.message : String(err));
@@ -157,6 +187,8 @@ export default function Home() {
               ))}
             </div>
           </div>
+
+          <StructureCard hits={result.structure} />
 
           <div className="card">
             <h2>Five-element balance 五行 (stems + branches)</h2>
