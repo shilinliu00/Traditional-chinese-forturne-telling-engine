@@ -211,7 +211,8 @@ export default function Home() {
           <p className="note">
             Year and month pillars switch at astronomical solar-term instants (computed from the
             sun&apos;s apparent ecliptic longitude, accurate to a few minutes). Day and hour pillars
-            use local solar time from birthplace longitude; the equation of time is not applied.
+            use true local solar time from birthplace longitude: the longitude meridian correction
+            plus the equation of time (up to ±16 minutes, Meeus ch. 28) both apply.
           </p>
         </>
       )}
