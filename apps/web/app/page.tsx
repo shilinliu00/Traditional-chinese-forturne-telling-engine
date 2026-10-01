@@ -6,6 +6,8 @@ import {
   readChart,
   evaluateRules,
   luckPillars,
+  dayMasterStrength,
+  favorableElements,
   annualPillar,
   baziYearAt,
   TEN_GOD_INFO,
@@ -19,6 +21,8 @@ import {
   type LuckPillar,
   type Pillar,
   type Element,
+  type StrengthResult,
+  type FavorableResult,
 } from '@bazi/engine';
 
 const ELEMENT_HANZI: Record<Element, string> = {
@@ -59,6 +63,52 @@ function StructureCard({ hits }: { hits: RuleHit[] }) {
   );
 }
 
+function StrengthCard({ strength, favorable }: {
+  strength: StrengthResult; favorable: FavorableResult;
+}) {
+  return (
+    <div className="card">
+      <h2>Day Master strength 旺衰 · favorable elements 喜用</h2>
+      <p style={{ fontSize: '1.25rem', fontWeight: 700, margin: '0.25rem 0' }}>
+        日主 {strength.dayMasterHanzi}（{ELEMENT_HANZI[strength.element]}）· {strength.verdictHanzi}
+        <span style={{ fontSize: '0.9rem', fontWeight: 400, color: 'var(--muted)' }}>
+          {' '}score {strength.score} / {strength.max}
+        </span>
+      </p>
+      <ul className="rule-list">
+        {strength.criteria.map((c) => (
+          <li key={c.name}>
+            <b>{c.name}</b> +{c.points}
+            <span className="meta"> — {c.factors.join('；')}</span>
+          </li>
+        ))}
+      </ul>
+      {favorable.favorable.length > 0 && (
+        <p>
+          <b>喜神 favorable:</b>{' '}
+          {favorable.favorable.map((a) => `${ELEMENT_HANZI[a.element]} ${a.element}`).join('、')}
+          <span className="meta"> — {favorable.favorable.map((a) => a.reason).join('；')}</span>
+        </p>
+      )}
+      {favorable.unfavorable.length > 0 && (
+        <p>
+          <b>忌神 unfavorable:</b>{' '}
+          {favorable.unfavorable.map((a) => `${ELEMENT_HANZI[a.element]} ${a.element}`).join('、')}
+          <span className="meta"> — {favorable.unfavorable.map((a) => a.reason).join('；')}</span>
+        </p>
+      )}
+      <p>
+        <b>调候 seasonal:</b>{' '}
+        {favorable.seasonal.element
+          ? `${ELEMENT_HANZI[favorable.seasonal.element]} ${favorable.seasonal.element}`
+          : '—'}
+        <span className="meta"> — {favorable.seasonal.reason}</span>
+      </p>
+      <p className="meta">First-order 扶抑 + 调候 aid from the strength verdict — {favorable.source}.</p>
+    </div>
+  );
+}
+
 function PillarCard({ reading, label, highlight }: {
   reading: PillarReading; label: string; highlight?: boolean;
 }) {
@@ -91,6 +141,7 @@ export default function Home() {
   const [gender, setGender] = useState<Gender>('male');
   const [result, setResult] = useState<{
     chart: BaZiChart; reading: ChartReading; structure: RuleHit[]; luck: LuckPillar[]; annual: Pillar; flowYear: number; ageYears: number;
+    strength: StrengthResult; favorable: FavorableResult;
   } | null>(null);
   const [error, setError] = useState('');
 
@@ -107,12 +158,14 @@ export default function Home() {
       const reading: ChartReading = readChart(input);
       const structure: RuleHit[] = evaluateRules(chart);
       const luck: LuckPillar[] = luckPillars({ ...input, gender });
+      const strength: StrengthResult = dayMasterStrength(chart);
+      const favorable: FavorableResult = favorableElements(chart);
       const now = new Date();
       const flowYear = baziYearAt(now);
       const annual = annualPillar(flowYear);
       const ageYears = (now.getTime() - new Date(`${date}T00:00:00`).getTime()) / 31_557_600_000;
       setError('');
-      setResult({ chart, reading, structure, luck, annual, flowYear, ageYears });
+      setResult({ chart, reading, structure, luck, annual, flowYear, ageYears, strength, favorable });
     } catch (err) {
       setResult(null);
       setError(err instanceof Error ? err.message : String(err));
@@ -189,6 +242,8 @@ export default function Home() {
           </div>
 
           <StructureCard hits={result.structure} />
+
+          <StrengthCard strength={result.strength} favorable={result.favorable} />
 
           <div className="card">
             <h2>Five-element balance 五行 (stems + branches)</h2>
