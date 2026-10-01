@@ -59,6 +59,16 @@ const hits = evaluateRules(chart);
 
 // Luck pillars (大运), direction from year-stem polarity × gender
 const lucks = luckPillars({ date: '2024-01-01', time: '12:00', gender: 'male' });
+
+// Day Master strength (旺衰): 得令/得地/得势 scoring with evidence
+import { dayMasterStrength, favorableElements } from './packages/engine/src/index.ts';
+const strength = dayMasterStrength(chart);
+// → { dayMasterHanzi: '甲', element: 'Wood', score: 5.5, verdictHanzi: '身旺', … }
+
+// Favorable elements (喜用神/忌神) + seasonal 调候, from the strength verdict
+const fav = favorableElements(chart);
+// → { verdictHanzi: '身旺', favorable: [火(食伤泄秀), 金(官杀制身), 土(财星耗身)],
+//     unfavorable: [水(印), 木(比劫)], seasonal: { element: null, … } }
 ```
 
 ## Run the web app
@@ -78,6 +88,7 @@ npm run dev    # → http://localhost:3000
 - **Hour pillar** uses the Five Rats rule (五鼠遁), with true-solar-time correction from birthplace longitude — longitude offset (1° = 4 min) plus the equation of time (Meeus ch. 28, ±16 min seasonal; verified against published anchors) — and the late-子时 rule (23:00–24:00 belongs to the next day).
 - **NaYin (纳音)**: the elemental sound of each pillar's stem-branch pair (e.g. 癸卯 = 金箔金), included in chart readings.
 - **Hidden stems (藏干)**: each branch's hidden stems resolved to Ten Gods vs. the Day Master, main qi first.
+- **Day Master strength (旺衰)** and **favorable elements (喜用神/忌神)**: `dayMasterStrength()` scores the classical 得令/得地/得势 criteria with evidence factors; `favorableElements()` derives a first-order 扶抑 recommendation (身弱喜印比、身旺喜食伤官杀财) plus the birth season's 调候 need (cold months → Fire, hot months → Water). Both are shown in the web UI.
 - **Structural rules (合/冲)**: `evaluateRules()` detects 天干五合, 地支六合, 三合局, 三会方, and 六冲 across the four pillars; every hit records its evidence (triggering pillars, human-readable factors) and the classical source (《三命通会》), keeping interpretation separate from calculation.
 - **Luck pillars (大运)**: direction from year-stem polarity × gender (阳男/阴女顺行, 阴男/阳女逆行); start age from birth-to-neighboring-Jie days ÷ 3 (三天折合一岁), fractional.
 - **Annual pillar (流年)**: the flowing year's ganzhi (the BaZi year begins at Lichun).
@@ -95,7 +106,7 @@ npm run dev    # → http://localhost:3000
 - [x] NaYin (纳音) + hidden-stem Ten Gods in chart readings
 - [x] Structural rule evaluation (合/冲) with evidence factors + classical citations
 - [x] Luck pillars (大运), annual pillars (流年)
-- [ ] Interpretation engine: Day Master strength (done: 得令/得地/得势 scoring in `packages/engine/src/strength.ts`), favorable elements, personality mapping
+- [ ] Interpretation engine: Day Master strength (done: 得令/得地/得势 scoring in `packages/engine/src/strength.ts`), favorable elements (done: 喜用神/忌神 + 调候 in `packages/engine/src/favorable.ts`, both shown in the web UI), personality mapping (still open)
 - [x] Next.js web app: chart UI, element-balance visualizations, bilingual EN/中文
 - [ ] Saved charts & share links
 
