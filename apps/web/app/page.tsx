@@ -299,6 +299,11 @@ export default function Home() {
                 {STEMS[result.annual.stem].pinyin} {BRANCHES[result.annual.branch].pinyin} · flowing year {result.flowYear}
               </span>
             </p>
+            <p className="meta">
+              {tenGod(result.chart.dayMaster, result.annual.stem)}{' '}
+              {TEN_GOD_INFO[tenGod(result.chart.dayMaster, result.annual.stem)].english} vs Day Master · 纳音{' '}
+              {nayinOf(result.annual.stem, result.annual.branch).name}
+            </p>
             <p className="meta">The flowing year begins at Lichun (立春), not January 1.</p>
           </div>
 
