@@ -10,6 +10,8 @@ import {
   favorableElements,
   annualPillar,
   baziYearAt,
+  tenGod,
+  nayinOf,
   TEN_GOD_INFO,
   STEMS,
   BRANCHES,
@@ -277,6 +279,8 @@ export default function Home() {
                   <div key={i} className={`luck-item${current ? ' current' : ''}`}>
                     <div className="hanzi">{lp.hanzi}</div>
                     <div className="age">from {lp.startAge.toFixed(1)} yrs</div>
+                    <div className="god">{tenGod(result.chart.dayMaster, lp.stem)}</div>
+                    <div className="nayin">纳音 {nayinOf(lp.stem, lp.branch).name}</div>
                   </div>
                 );
               })}
