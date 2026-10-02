@@ -41,6 +41,21 @@ describe('term boundaries', () => {
   });
 });
 
+describe('timezone handling', () => {
+  it('the same UTC instant gives the same year and month in any timezone', () => {
+    // 2024-02-04 08:22 UTC is just after Lichun 2024: 甲辰 year in both views.
+    const utc = calculateBaZi({ date: '2024-02-04', time: '08:22', utcOffsetMinutes: 0 });
+    const beijing = calculateBaZi({ date: '2024-02-04', time: '16:22', utcOffsetMinutes: 480 });
+    const newYork = calculateBaZi({ date: '2024-02-04', time: '03:22', utcOffsetMinutes: -300 });
+    assert.equal(utc.year.hanzi, '甲辰');
+    assert.equal(beijing.year.hanzi, utc.year.hanzi);
+    assert.equal(newYork.year.hanzi, utc.year.hanzi);
+    assert.equal(beijing.month.hanzi, utc.month.hanzi);
+    assert.equal(newYork.month.hanzi, utc.month.hanzi);
+    assert.equal(beijing.day.hanzi, utc.day.hanzi);
+  });
+});
+
 describe('leap-day continuity', () => {
   it('day pillars advance by exactly one across Feb 29', () => {
     const d28 = dayPillarIndex(2024, 2, 28);
