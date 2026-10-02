@@ -90,7 +90,7 @@ npm run dev    # → http://localhost:3000
 - **Hidden stems (藏干)**: each branch's hidden stems resolved to Ten Gods vs. the Day Master, main qi first.
 - **Day Master strength (旺衰)** and **favorable elements (喜用神/忌神)**: `dayMasterStrength()` scores the classical 得令/得地/得势 criteria with evidence factors; `favorableElements()` derives a first-order 扶抑 recommendation (身弱喜印比、身旺喜食伤官杀财) plus the birth season's 调候 need (cold months → Fire, hot months → Water). Both are shown in the web UI.
 - **Structural rules (合/冲)**: `evaluateRules()` detects 天干五合, 地支六合, 三合局, 三会方, and 六冲 across the four pillars; every hit records its evidence (triggering pillars, human-readable factors) and the classical source (《三命通会》), keeping interpretation separate from calculation.
-- **Luck pillars (大运)**: direction from year-stem polarity × gender (阳男/阴女顺行, 阴男/阳女逆行); start age from birth-to-neighboring-Jie days ÷ 3 (三天折合一岁), fractional.
+- **Luck pillars (大运)**: direction from year-stem polarity × gender (阳男/阴女顺行, 阴男/阳女逆行); start age from birth-to-neighboring-Jie days ÷ 3 (三天折合一岁), fractional. Shown in the web UI alongside each pillar's Ten God and NaYin.
 - **Annual pillar (流年)**: the flowing year's ganzhi (the BaZi year begins at Lichun).
 
 ## Accuracy notes (honest)
