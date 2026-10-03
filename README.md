@@ -107,7 +107,6 @@ npm run dev    # → http://localhost:3000
 - [x] Structural rule evaluation (合/冲) with evidence factors + classical citations
 - [x] Luck pillars (大运), annual pillars (流年)
 - [ ] Interpretation engine: Day Master strength (done: 得令/得地/得势 scoring in `packages/engine/src/strength.ts`), favorable elements (done: 喜用神/忌神 + 调候 in `packages/engine/src/favorable.ts`, both shown in the web UI), personality mapping (still open)
-- [x] Next.js web app: chart UI, element-balance visualizations, bilingual EN/中文
+- [x] Next.js web app: chart UI, element-balance visualizations (English UI with hanzi/pinyin labels)
+- [ ] Bilingual EN/中文 UI toggle
 - [ ] Saved charts & share links
-
-(Bilingual UI and saved charts are still open — the web app currently ships in English with hanzi/pinyin labels.)
