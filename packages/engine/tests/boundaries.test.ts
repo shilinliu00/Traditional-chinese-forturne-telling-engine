@@ -56,6 +56,44 @@ describe('timezone handling', () => {
   });
 });
 
+describe('late zi hour (晚子时)', () => {
+  it('rolls the day over at exactly 23:00, not one minute before', () => {
+    const before = calculateBaZi({ date: '2024-01-01', time: '22:59' });
+    assert.equal(before.day.hanzi, '甲子');
+    assert.equal(before.hour.hanzi, '乙亥'); // 亥时 of the 甲 day
+    const at = calculateBaZi({ date: '2024-01-01', time: '23:00' });
+    assert.equal(at.day.hanzi, '乙丑'); // late 子时 belongs to the next day
+    assert.equal(at.hour.hanzi, '丙子'); // 子时 stem from the new 乙 day stem
+  });
+
+  it('switches the hour branch at exactly 01:00 (子 → 丑) without rolling the day', () => {
+    const zi = calculateBaZi({ date: '2024-01-01', time: '00:59' });
+    assert.equal(zi.day.hanzi, '甲子');
+    assert.equal(zi.hour.hanzi, '甲子');
+    const chou = calculateBaZi({ date: '2024-01-01', time: '01:00' });
+    assert.equal(chou.day.hanzi, '甲子'); // early 子时 stays on the same day
+    assert.equal(chou.hour.hanzi, '乙丑');
+  });
+
+  it('longitude correction can push clock time into late zi hour', () => {
+    // 22:50 at 135°E on the 120°E meridian → solar ≈ 23:47 → next day.
+    const c = calculateBaZi({
+      date: '2024-01-01', time: '22:50', longitude: 135, meridian: 120,
+    });
+    assert.equal(c.day.hanzi, '乙丑');
+    assert.equal(c.hour.hanzi, '丙子');
+  });
+
+  it('longitude correction can pull clock time back out of late zi hour', () => {
+    // 23:10 at 105°E on the 120°E meridian → solar ≈ 22:07 → same day.
+    const c = calculateBaZi({
+      date: '2024-01-01', time: '23:10', longitude: 105, meridian: 120,
+    });
+    assert.equal(c.day.hanzi, '甲子');
+    assert.equal(c.hour.hanzi, '乙亥');
+  });
+});
+
 describe('leap-day continuity', () => {
   it('day pillars advance by exactly one across Feb 29', () => {
     const d28 = dayPillarIndex(2024, 2, 28);
