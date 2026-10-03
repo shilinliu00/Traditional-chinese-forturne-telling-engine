@@ -25,6 +25,7 @@ import {
   type Element,
   type StrengthResult,
   type FavorableResult,
+  type TenGod,
 } from '@bazi/engine';
 
 const ELEMENT_HANZI: Record<Element, string> = {
@@ -177,6 +178,21 @@ export default function Home() {
   const offsets: string[] = [];
   for (let h = -12; h <= 14; h += 0.5) offsets.push(String(h));
 
+  const godCounts: Array<{ god: TenGod; count: number }> = result
+    ? (Object.keys(TEN_GOD_INFO) as TenGod[])
+        .map((g) => ({
+          god: g,
+          count: (['year', 'month', 'day', 'hour'] as const).reduce(
+            (n, k) =>
+              n +
+              (result.reading[k].tenGod === g ? 1 : 0) +
+              result.reading[k].hiddenGods.filter((h) => h === g).length,
+            0,
+          ),
+        }))
+        .filter((x) => x.count > 0)
+    : [];
+
   return (
     <>
       <h1>BaZi Calculator · 八字排盘</h1>
@@ -241,6 +257,21 @@ export default function Home() {
                 />
               ))}
             </div>
+          </div>
+
+          <div className="card">
+            <h2>Ten Gods 十神 · stems and hidden stems</h2>
+            <div className="element-bar">
+              {godCounts.map(({ god, count }) => (
+                <span key={god} className="element-chip">
+                  {god} {TEN_GOD_INFO[god].english} × {count}
+                </span>
+              ))}
+            </div>
+            <p className="meta">
+              Counts the four pillar stems plus every hidden stem （藏干） in the four branches,
+              each resolved against the Day Master.
+            </p>
           </div>
 
           <StructureCard hits={result.structure} />
