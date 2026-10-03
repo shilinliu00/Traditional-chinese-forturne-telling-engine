@@ -304,6 +304,14 @@ export default function Home() {
               {TEN_GOD_INFO[tenGod(result.chart.dayMaster, result.annual.stem)].english} vs Day Master · 纳音{' '}
               {nayinOf(result.annual.stem, result.annual.branch).name}
             </p>
+            <p className="meta">
+              藏干{' '}
+              {BRANCHES[result.annual.branch].hiddenStems.map((s) => (
+                <span key={s}>
+                  <b>{STEMS[s].hanzi}</b> {tenGod(result.chart.dayMaster, s)}{' '}
+                </span>
+              ))}
+            </p>
             <p className="meta">The flowing year begins at Lichun (立春), not January 1.</p>
           </div>
 
