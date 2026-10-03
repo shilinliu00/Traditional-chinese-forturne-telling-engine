@@ -115,4 +115,23 @@ describe('leap-day continuity', () => {
     assert.equal(c.day.stem, idx % 10);
     assert.equal(c.day.branch, idx % 12);
   });
+
+  it('rejects Feb 29 in century years not divisible by 400', () => {
+    // 1900 and 2100 are not leap years under the Gregorian century rule.
+    for (const date of ['1900-02-29', '2100-02-29']) {
+      assert.throws(() => calculateBaZi({ date, time: '12:00' }), /Invalid date/);
+    }
+  });
+
+  it('accepts Feb 29 in year 2000 and keeps the 60-cycle continuous', () => {
+    // 2000 is divisible by 400, so it is a leap year.
+    const d28 = dayPillarIndex(2000, 2, 28);
+    const d29 = dayPillarIndex(2000, 2, 29);
+    const d01 = dayPillarIndex(2000, 3, 1);
+    assert.equal(d29, (d28 + 1) % 60);
+    assert.equal(d01, (d29 + 1) % 60);
+    const c = calculateBaZi({ date: '2000-02-29', time: '12:00' });
+    assert.equal(c.day.stem, d29 % 10);
+    assert.equal(c.day.branch, d29 % 12);
+  });
 });
