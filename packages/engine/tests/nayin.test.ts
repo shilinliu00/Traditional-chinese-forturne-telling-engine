@@ -43,4 +43,9 @@ describe('nayin', () => {
     assert.equal(r.year.nayin.element, 'Metal');
     assert.equal(r.day.nayin.name, '海中金'); // 甲子日
   });
+
+  it('rejects stem branch pairs outside the sixty cycle', () => {
+    // 甲 (yang) can never pair with 丑 (yin); the cycle has no such pillar.
+    assert.throws(() => nayinOf(0, 1), /Invalid pairing/);
+  });
 });
