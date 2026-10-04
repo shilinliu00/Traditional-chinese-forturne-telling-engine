@@ -304,6 +304,14 @@ export default function Home() {
                     <div className="age">from {lp.startAge.toFixed(1)} yrs</div>
                     <div className="god">{tenGod(result.chart.dayMaster, lp.stem)}</div>
                     <div className="nayin">纳音 {nayinOf(lp.stem, lp.branch).name}</div>
+                    <div className="hidden-stems">
+                      藏干{' '}
+                      {BRANCHES[lp.branch].hiddenStems.map((s) => (
+                        <span key={s}>
+                          <b>{STEMS[s].hanzi}</b> {tenGod(result.chart.dayMaster, s)}{' '}
+                        </span>
+                      ))}
+                    </div>
                   </div>
                 );
               })}
