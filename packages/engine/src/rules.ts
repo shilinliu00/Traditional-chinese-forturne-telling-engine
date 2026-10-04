@@ -1,5 +1,5 @@
 /**
- * Structural rule evaluation (合/冲 analysis) over a computed chart.
+ * Structural rule evaluation (合/冲/害 analysis) over a computed chart.
  *
  * Design note: chart *calculation* lives in pillars.ts; this module is the
  * *interpretation* layer. Each rule hit keeps its evidence (the pillars
@@ -77,6 +77,16 @@ const BRANCH_CLASHES: Array<[number, number]> = [
   [3, 9],   // 卯酉冲
   [4, 10],  // 辰戌冲
   [5, 11],  // 巳亥冲
+];
+
+/** 地支六害: harming branch pairs. Documented in 《三命通会》. */
+const BRANCH_HARMS: Array<[number, number]> = [
+  [0, 7],   // 子未害
+  [1, 6],   // 丑午害
+  [2, 5],   // 寅巳害
+  [3, 4],   // 卯辰害
+  [8, 11],  // 申亥害
+  [9, 10],  // 酉戌害
 ];
 
 const SOURCE = '《三命通会》';
@@ -172,6 +182,22 @@ export function evaluateRules(chart: BaZiChart): RuleHit[] {
         rule: 'branch-clash',
         name: '地支六冲',
         pattern: `${BRANCHES[a].hanzi}${BRANCHES[b].hanzi}相冲`,
+        pillars: [pa, pb],
+        factors: [`${PILLAR_NAME[pa]}支${BRANCHES[a].hanzi}`, `${PILLAR_NAME[pb]}支${BRANCHES[b].hanzi}`],
+        source: SOURCE,
+      });
+    }
+  }
+
+  // 地支六害 — any harming pair.
+  for (const [a, b] of BRANCH_HARMS) {
+    const pa = PILLAR_ORDER.find((k) => chart[k].branch === a);
+    const pb = PILLAR_ORDER.find((k) => chart[k].branch === b);
+    if (pa !== undefined && pb !== undefined) {
+      hits.push({
+        rule: 'branch-harm',
+        name: '地支六害',
+        pattern: `${BRANCHES[a].hanzi}${BRANCHES[b].hanzi}相害`,
         pillars: [pa, pb],
         factors: [`${PILLAR_NAME[pa]}支${BRANCHES[a].hanzi}`, `${PILLAR_NAME[pb]}支${BRANCHES[b].hanzi}`],
         source: SOURCE,

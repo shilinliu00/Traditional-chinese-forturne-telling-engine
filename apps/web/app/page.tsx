@@ -46,9 +46,9 @@ const PILLAR_ZH: Record<string, string> = {
 function StructureCard({ hits }: { hits: RuleHit[] }) {
   return (
     <div className="card">
-      <h2>Chart structure 合冲</h2>
+      <h2>Chart structure 合冲害</h2>
       {hits.length === 0 ? (
-        <p className="meta">No stem combinations, branch combinations, or clashes 合/冲 found in this chart.</p>
+        <p className="meta">No stem combinations, branch combinations, clashes, or harms 合/冲/害 found in this chart.</p>
       ) : (
         <ul className="rule-list">
           {hits.map((hit, i) => (

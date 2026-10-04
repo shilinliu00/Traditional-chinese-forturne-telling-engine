@@ -20,7 +20,7 @@ bazi-calculator/
 │       │   ├── pillars.ts     # Year/month/day/hour pillar calculation
 │       │   ├── luckPillars.ts # Luck pillars (大运) + annual pillars (流年)
 │       │   ├── reading.ts     # Chart readings: Ten Gods, NaYin, hidden-stem gods
-│       │   ├── rules.ts       # Structural rules (合/冲) with evidence + classical sources
+│       │   ├── rules.ts       # Structural rules (合/冲/害) with evidence + classical sources
 │       │   └── index.ts       # Public API
 │       └── tests/
 └── apps/
@@ -50,7 +50,7 @@ const reading = readChart({ date: '2024-01-01', time: '12:00' });
 // → year: 癸卯 (正印, 金箔金, 藏干[劫财]), month: 甲子 (比肩, 海中金, 藏干[正印]),
 //   day: 甲子 (比肩, 海中金, 藏干[正印]), hour: 庚午 (七杀, 路旁土, 藏干[伤官, 正财])
 
-// Structural rules (合/冲): each hit keeps its evidence and classical source
+// Structural rules (合/冲/害): each hit keeps its evidence and classical source
 import { evaluateRules } from './packages/engine/src/index.ts';
 const hits = evaluateRules(chart);
 // → [{ rule: 'triple-combination', pattern: '申子辰合水局',
@@ -89,7 +89,7 @@ npm run dev    # → http://localhost:3000
 - **NaYin (纳音)**: the elemental sound of each pillar's stem-branch pair (e.g. 癸卯 = 金箔金), included in chart readings.
 - **Hidden stems (藏干)**: each branch's hidden stems resolved to Ten Gods vs. the Day Master, main qi first.
 - **Day Master strength (旺衰)** and **favorable elements (喜用神/忌神)**: `dayMasterStrength()` scores the classical 得令/得地/得势 criteria with evidence factors; `favorableElements()` derives a first-order 扶抑 recommendation (身弱喜印比、身旺喜食伤官杀财) plus the birth season's 调候 need (cold months → Fire, hot months → Water). Both are shown in the web UI.
-- **Structural rules (合/冲)**: `evaluateRules()` detects 天干五合, 地支六合, 三合局, 三会方, and 六冲 across the four pillars; every hit records its evidence (triggering pillars, human-readable factors) and the classical source (《三命通会》), keeping interpretation separate from calculation.
+- **Structural rules (合/冲/害)**: `evaluateRules()` detects 天干五合, 地支六合, 三合局, 三会方, 六冲, and 六害 across the four pillars; every hit records its evidence (triggering pillars, human-readable factors) and the classical source (《三命通会》), keeping interpretation separate from calculation.
 - **Luck pillars (大运)**: direction from year-stem polarity × gender (阳男/阴女顺行, 阴男/阳女逆行); start age from birth-to-neighboring-Jie days ÷ 3 (三天折合一岁), fractional. Shown in the web UI alongside each pillar's Ten God and NaYin.
 - **Annual pillar (流年)**: the flowing year's ganzhi (the BaZi year begins at Lichun).
 
@@ -104,7 +104,7 @@ npm run dev    # → http://localhost:3000
 - [x] Astronomical solar-term calculation
 - [x] True solar time: longitude correction + equation of time
 - [x] NaYin (纳音) + hidden-stem Ten Gods in chart readings
-- [x] Structural rule evaluation (合/冲) with evidence factors + classical citations
+- [x] Structural rule evaluation (合/冲/害) with evidence factors + classical citations
 - [x] Luck pillars (大运), annual pillars (流年)
 - [ ] Interpretation engine: Day Master strength (done: 得令/得地/得势 scoring in `packages/engine/src/strength.ts`), favorable elements (done: 喜用神/忌神 + 调候 in `packages/engine/src/favorable.ts`, both shown in the web UI), personality mapping (still open)
 - [x] Next.js web app: chart UI, element-balance visualizations (English UI with hanzi/pinyin labels)
