@@ -22,7 +22,8 @@
  *
  * 调候: births in the cold season (month branch whose main qi is Water,
  * or 丑) tend to need Fire (水寒需火暖); births in the hot season (main
- * qi Fire, 巳午) tend to need Water (火炎需水济).
+ * qi Fire, 巳午, plus 未 as the last month of summer) tend to need Water
+ * (火炎需水济).
  */
 import { STEMS, BRANCHES, type Element } from './data.ts';
 import { GENERATES, CONTROLS } from './elements.ts';
@@ -153,7 +154,9 @@ export function favorableElements(chart: BaZiChart): FavorableResult {
       element: 'Fire',
       reason: `月支${monthBranch.hanzi}寒湿，需火调候暖局`,
     };
-  } else if (mainQi === 'Fire') {
+  } else if (mainQi === 'Fire' || monthBranch.hanzi === '未') {
+    // 未 is the last month of summer (三夏: 巳午未); its main qi is Earth,
+    // but the season is still hot, so it needs Water like 巳/午.
     seasonal = {
       element: 'Water',
       reason: `月支${monthBranch.hanzi}炎热，需水调候济火`,

@@ -5,7 +5,7 @@
  *
  * Stem index reference: 0甲Wood 1乙Wood 2丙Fire 3丁Fire 4戊Earth 5己Earth
  * 6庚Metal 7辛Metal 8壬Water 9癸Water.
- * Branch index reference: 0子 1丑 2寅 3卯 6午 8申 11亥.
+ * Branch index reference: 0子 1丑 2寅 3卯 6午 7未 8申 11亥.
  */
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
@@ -102,5 +102,17 @@ describe('favorableElements', () => {
     );
     const r = favorableElements(mild);
     assert.equal(r.seasonal.element, null);
+  });
+
+  it('wei month (未) counts as hot season despite its earth main qi', () => {
+    // 未 is the last month of summer (三夏 巳午未); main qi is Earth (己),
+    // so the Fire main-qi check alone would miss it.
+    const hotWei = chart(
+      [[1, 0], [2, 7], [0, 3], [8, 3]],
+      0,
+    );
+    const r = favorableElements(hotWei);
+    assert.equal(r.seasonal.element, 'Water');
+    assert.ok(r.seasonal.reason.includes('未'));
   });
 });
