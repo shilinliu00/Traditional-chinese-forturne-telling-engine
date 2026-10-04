@@ -5,6 +5,7 @@ import {
   calculateBaZi,
   readChart,
   evaluateRules,
+  elementBalance,
   luckPillars,
   dayMasterStrength,
   favorableElements,
@@ -281,20 +282,11 @@ export default function Home() {
           <div className="card">
             <h2>Five-element balance 五行 (stems + branches)</h2>
             <div className="element-bar">
-              {(Object.keys(ELEMENT_HANZI) as Element[]).map((el) => {
-                const count = (['year', 'month', 'day', 'hour'] as const).reduce(
-                  (n, k) =>
-                    n +
-                    (STEMS[result.chart[k].stem].element === el ? 1 : 0) +
-                    (BRANCHES[result.chart[k].branch].element === el ? 1 : 0),
-                  0,
-                );
-                return (
-                  <span key={el} className="element-chip">
-                    {ELEMENT_HANZI[el]} {el} × {count}
-                  </span>
-                );
-              })}
+              {(Object.keys(ELEMENT_HANZI) as Element[]).map((el) => (
+                <span key={el} className="element-chip">
+                  {ELEMENT_HANZI[el]} {el} × {elementBalance(result.chart)[el]}
+                </span>
+              ))}
             </div>
           </div>
 
