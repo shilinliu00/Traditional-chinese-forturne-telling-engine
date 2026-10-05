@@ -35,6 +35,59 @@ const ELEMENT_HANZI: Record<Element, string> = {
   Wood: '木', Fire: '火', Earth: '土', Metal: '金', Water: '水',
 };
 
+type Lang = 'en' | 'zh';
+
+const STR: Record<Lang, Record<string, string>> = {
+  en: {
+    title: 'BaZi Calculator · 八字排盘',
+    subtitle: 'Four Pillars of Destiny with astronomical solar terms — enter a birth moment, get the full chart.',
+    toggle: '中文',
+    birthDetails: 'Birth details',
+    birthDate: 'Birth date',
+    birthTime: 'Birth time (clock)',
+    timezone: 'Clock timezone (UTC offset)',
+    longitude: 'Birthplace longitude °E (solar-time correction)',
+    male: 'Male 男',
+    female: 'Female 女',
+    calculate: 'Calculate 排盘',
+    fourPillars: 'Four pillars 四柱',
+    dayMaster: 'Day Master 日主',
+    tenGods: 'Ten Gods 十神 · stems and hidden stems',
+    structure: 'Chart structure 合冲害',
+    strength: 'Day Master strength 旺衰 · favorable elements 喜用',
+    personality: 'Dominant temperaments 性格',
+    balance: 'Five-element balance 五行 (stems + branches)',
+    luck: 'Luck pillars 大运',
+    forward: '顺行 forward',
+    backward: '逆行 backward',
+    annual: 'Annual pillar 流年',
+  },
+  zh: {
+    title: '八字排盘',
+    subtitle: '以天文节气排八字——输入出生时刻，得到完整命盘。',
+    toggle: 'English',
+    birthDetails: '出生信息',
+    birthDate: '出生日期',
+    birthTime: '出生时间',
+    timezone: '时区（UTC 偏移）',
+    longitude: '出生地经度 °E（真太阳时校正）',
+    male: '男',
+    female: '女',
+    calculate: '排盘',
+    fourPillars: '四柱',
+    dayMaster: '日主',
+    tenGods: '十神',
+    structure: '格局 合冲害',
+    strength: '旺衰 · 喜用',
+    personality: '性格',
+    balance: '五行平衡',
+    luck: '大运',
+    forward: '顺行',
+    backward: '逆行',
+    annual: '流年',
+  },
+};
+
 const PILLAR_LABELS = [
   { key: 'year', label: 'Year 年柱' },
   { key: 'month', label: 'Month 月柱' },
@@ -46,10 +99,10 @@ const PILLAR_ZH: Record<string, string> = {
   year: '年柱', month: '月柱', day: '日柱', hour: '时柱',
 };
 
-function StructureCard({ hits }: { hits: RuleHit[] }) {
+function StructureCard({ hits, t }: { hits: RuleHit[]; t: Record<string, string> }) {
   return (
     <div className="card">
-      <h2>Chart structure 合冲害</h2>
+      <h2>{t.structure}</h2>
       {hits.length === 0 ? (
         <p className="meta">No stem combinations, branch combinations, clashes, or harms 合/冲/害 found in this chart.</p>
       ) : (
@@ -69,12 +122,12 @@ function StructureCard({ hits }: { hits: RuleHit[] }) {
   );
 }
 
-function StrengthCard({ strength, favorable }: {
-  strength: StrengthResult; favorable: FavorableResult;
+function StrengthCard({ strength, favorable, t }: {
+  strength: StrengthResult; favorable: FavorableResult; t: Record<string, string>;
 }) {
   return (
     <div className="card">
-      <h2>Day Master strength 旺衰 · favorable elements 喜用</h2>
+      <h2>{t.strength}</h2>
       <p style={{ fontSize: '1.25rem', fontWeight: 700, margin: '0.25rem 0' }}>
         日主 {strength.dayMasterHanzi}（{ELEMENT_HANZI[strength.element]}）· {strength.verdictHanzi}
         <span style={{ fontSize: '0.9rem', fontWeight: 400, color: 'var(--muted)' }}>
@@ -115,10 +168,10 @@ function StrengthCard({ strength, favorable }: {
   );
 }
 
-function PersonalityCard({ traits }: { traits: PersonalityTrait[] }) {
+function PersonalityCard({ traits, t }: { traits: PersonalityTrait[]; t: Record<string, string> }) {
   return (
     <div className="card">
-      <h2>Dominant temperaments 性格</h2>
+      <h2>{t.personality}</h2>
       {traits.length === 0 ? (
         <p className="meta">No Ten God data to read.</p>
       ) : (
@@ -167,6 +220,8 @@ function PillarCard({ reading, label, highlight }: {
 }
 
 export default function Home() {
+  const [lang, setLang] = useState<Lang>('en');
+  const t = STR[lang];
   const [date, setDate] = useState('2000-06-15');
   const [time, setTime] = useState('12:00');
   const [utcOffset, setUtcOffset] = useState('8');
@@ -226,25 +281,34 @@ export default function Home() {
 
   return (
     <>
-      <h1>BaZi Calculator · 八字排盘</h1>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <h1>{t.title}</h1>
+        <button
+          type="button"
+          onClick={() => setLang(lang === 'en' ? 'zh' : 'en')}
+          style={{ height: 'fit-content', padding: '0.4rem 0.9rem' }}
+        >
+          {t.toggle}
+        </button>
+      </div>
       <p className="subtitle">
-        Four Pillars of Destiny with astronomical solar terms — enter a birth moment, get the full chart.
+        {t.subtitle}
       </p>
 
       <div className="card">
-        <h2>Birth details</h2>
+        <h2>{t.birthDetails}</h2>
         <form onSubmit={handleSubmit}>
           <div className="form-grid">
             <div className="field">
-              <label>Birth date</label>
+              <label>{t.birthDate}</label>
               <input type="date" value={date} onChange={(e) => setDate(e.target.value)} required />
             </div>
             <div className="field">
-              <label>Birth time (clock)</label>
+              <label>{t.birthTime}</label>
               <input type="time" value={time} onChange={(e) => setTime(e.target.value)} required />
             </div>
             <div className="field">
-              <label>Clock timezone (UTC offset)</label>
+              <label>{t.timezone}</label>
               <select value={utcOffset} onChange={(e) => setUtcOffset(e.target.value)}>
                 {offsets.map((o) => (
                   <option key={o} value={o}>
@@ -254,7 +318,7 @@ export default function Home() {
               </select>
             </div>
             <div className="field">
-              <label>Birthplace longitude °E (solar-time correction)</label>
+              <label>{t.longitude}</label>
               <input
                 type="number" step="0.1" min="-180" max="180"
                 value={longitude} onChange={(e) => setLongitude(e.target.value)}
@@ -262,11 +326,11 @@ export default function Home() {
               />
             </div>
             <div className="radio-row">
-              <label><input type="radio" checked={gender === 'male'} onChange={() => setGender('male')} /> Male 男</label>
-              <label><input type="radio" checked={gender === 'female'} onChange={() => setGender('female')} /> Female 女</label>
+              <label><input type="radio" checked={gender === 'male'} onChange={() => setGender('male')} /> {t.male}</label>
+              <label><input type="radio" checked={gender === 'female'} onChange={() => setGender('female')} /> {t.female}</label>
             </div>
           </div>
-          <button className="primary" type="submit">Calculate 排盘</button>
+          <button className="primary" type="submit">{t.calculate}</button>
         </form>
         {error && <p style={{ color: '#a33' }}>{error}</p>}
       </div>
@@ -275,7 +339,7 @@ export default function Home() {
         <>
           <div className="card">
             <h2>
-              Four pillars 四柱 · Day Master 日主{' '}
+              {t.fourPillars} · {t.dayMaster}{' '}
               {STEMS[result.chart.dayMaster].hanzi} ({STEMS[result.chart.dayMaster].pinyin})
             </h2>
             <div className="pillars">
@@ -291,7 +355,7 @@ export default function Home() {
           </div>
 
           <div className="card">
-            <h2>Ten Gods 十神 · stems and hidden stems</h2>
+            <h2>{t.tenGods}</h2>
             <div className="element-bar">
               {godCounts.map(({ god, count }) => (
                 <span key={god} className="element-chip">
@@ -305,14 +369,14 @@ export default function Home() {
             </p>
           </div>
 
-          <StructureCard hits={result.structure} />
+          <StructureCard hits={result.structure} t={t} />
 
-          <StrengthCard strength={result.strength} favorable={result.favorable} />
+          <StrengthCard strength={result.strength} favorable={result.favorable} t={t} />
 
-          <PersonalityCard traits={result.personality} />
+          <PersonalityCard traits={result.personality} t={t} />
 
           <div className="card">
-            <h2>Five-element balance 五行 (stems + branches)</h2>
+            <h2>{t.balance}</h2>
             <div className="element-bar">
               {(Object.keys(ELEMENT_HANZI) as Element[]).map((el) => (
                 <span key={el} className="element-chip">
@@ -324,7 +388,7 @@ export default function Home() {
 
           <div className="card">
             <h2>
-              Luck pillars 大运 · {result.luck[0].direction === 'forward' ? '顺行 forward' : '逆行 backward'}
+              {t.luck} · {result.luck[0].direction === 'forward' ? t.forward : t.backward}
             </h2>
             <div className="luck-list">
               {result.luck.map((lp, i) => {
@@ -355,7 +419,7 @@ export default function Home() {
           </div>
 
           <div className="card">
-            <h2>Annual pillar 流年</h2>
+            <h2>{t.annual}</h2>
             <p style={{ fontSize: '1.5rem', fontWeight: 700, margin: '0.25rem 0' }}>
               {result.annual.hanzi}{' '}
               <span style={{ fontSize: '0.9rem', fontWeight: 400, color: 'var(--muted)' }}>
