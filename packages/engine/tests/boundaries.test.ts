@@ -54,6 +54,36 @@ describe('timezone handling', () => {
     assert.equal(newYork.month.hanzi, utc.month.hanzi);
     assert.equal(beijing.day.hanzi, utc.day.hanzi);
   });
+
+  it('half hour offsets resolve the same UTC instant (India, Nepal, Newfoundland)', () => {
+    // 2024-01-01 12:00 UTC seen from UTC+5:30 (17:30), UTC+5:45 (17:45),
+    // and UTC-3:30 (08:30). Year, month and day follow the UTC instant;
+    // the hour branch follows local clock time when no longitude is given.
+    const utc = calculateBaZi({ date: '2024-01-01', time: '12:00', utcOffsetMinutes: 0 });
+    const india = calculateBaZi({ date: '2024-01-01', time: '17:30', utcOffsetMinutes: 330 });
+    const nepal = calculateBaZi({ date: '2024-01-01', time: '17:45', utcOffsetMinutes: 345 });
+    const newfoundland = calculateBaZi({ date: '2024-01-01', time: '08:30', utcOffsetMinutes: -210 });
+    for (const c of [india, nepal, newfoundland]) {
+      assert.equal(c.year.hanzi, utc.year.hanzi);
+      assert.equal(c.month.hanzi, utc.month.hanzi);
+      assert.equal(c.day.hanzi, utc.day.hanzi);
+    }
+  });
+
+  it('longitude corrected solar time agrees across half hour offsets', () => {
+    // Same instant (2024-01-01 12:00 UTC) and same birthplace longitude:
+    // the meridian now derives from each clock timezone's own offset,
+    // so solar time — and all four pillars — must match.
+    const utc = calculateBaZi({ date: '2024-01-01', time: '12:00', utcOffsetMinutes: 0, longitude: 77.2 });
+    const india = calculateBaZi({ date: '2024-01-01', time: '17:30', utcOffsetMinutes: 330, longitude: 77.2 });
+    const nepal = calculateBaZi({ date: '2024-01-01', time: '17:45', utcOffsetMinutes: 345, longitude: 77.2 });
+    for (const c of [india, nepal]) {
+      assert.equal(c.year.hanzi, utc.year.hanzi);
+      assert.equal(c.month.hanzi, utc.month.hanzi);
+      assert.equal(c.day.hanzi, utc.day.hanzi);
+      assert.equal(c.hour.hanzi, utc.hour.hanzi);
+    }
+  });
 });
 
 describe('late zi hour (晚子时)', () => {

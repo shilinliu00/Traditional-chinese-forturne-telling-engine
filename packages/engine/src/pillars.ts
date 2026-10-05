@@ -32,7 +32,10 @@ export interface BirthInput {
   time: string;
   /** Birthplace longitude in degrees East. Enables true-solar-time correction. */
   longitude?: number;
-  /** Standard meridian of the clock timezone in degrees East (default 120 = Beijing time). */
+  /** Standard meridian of the clock timezone in degrees East.
+   * Defaults to the utcOffsetMinutes meridian (offset/15), or 120 = Beijing
+   * time when no offset is given. Needed so longitude correction stays
+   * consistent when the same instant is given in different timezones. */
   meridian?: number;
   /**
    * Clock timezone's offset from UTC in minutes (e.g. 480 = UTC+8).
@@ -157,8 +160,10 @@ export function calculateBaZi(input: BirthInput): BaZiChart {
 
   // True solar time: 1° of longitude = 4 minutes vs. the standard meridian,
   // plus the equation of time (seasonal, up to ±16 minutes). Only applied
-  // when the birthplace longitude is known.
-  const meridian = input.meridian ?? 120;
+  // when the birthplace longitude is known. The meridian comes from the
+  // clock timezone's own offset unless explicitly overridden, so the same
+  // instant expressed in different zones lands on the same solar time.
+  const meridian = input.meridian ?? (input.utcOffsetMinutes ?? 480) / 4; // 1° = 4 minutes
   const solarTotal =
     hh * 60 +
     mm +
