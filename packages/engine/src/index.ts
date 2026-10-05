@@ -16,3 +16,4 @@ export * from './reading.ts';
 export * from './rules.ts';
 export * from './strength.ts';
 export * from './favorable.ts';
+export * from './personality.ts';
