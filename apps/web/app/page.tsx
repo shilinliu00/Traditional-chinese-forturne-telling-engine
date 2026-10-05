@@ -13,6 +13,7 @@ import {
   baziYearAt,
   tenGod,
   nayinOf,
+  personalityTraits,
   TEN_GOD_INFO,
   STEMS,
   BRANCHES,
@@ -26,6 +27,7 @@ import {
   type Element,
   type StrengthResult,
   type FavorableResult,
+  type PersonalityTrait,
   type TenGod,
 } from '@bazi/engine';
 
@@ -113,6 +115,33 @@ function StrengthCard({ strength, favorable }: {
   );
 }
 
+function PersonalityCard({ traits }: { traits: PersonalityTrait[] }) {
+  return (
+    <div className="card">
+      <h2>Dominant temperaments 性格</h2>
+      {traits.length === 0 ? (
+        <p className="meta">No Ten God data to read.</p>
+      ) : (
+        <ul className="rule-list">
+          {traits.map((t) => (
+            <li key={t.god}>
+              <b>{t.god} · {t.english}</b> × {t.count}
+              <span className="meta">
+                {' '}— {t.keywords.join(' · ')} · {t.keywordsZh.join('、')}
+                {' '}({t.expression} {t.expressionZh})
+              </span>
+            </li>
+          ))}
+        </ul>
+      )}
+      <p className="meta">
+        Top Ten Gods by count across pillar stems and hidden stems — conventional
+        shorthand hints, not predictions. Expression follows the Day Master strength verdict.
+      </p>
+    </div>
+  );
+}
+
 function PillarCard({ reading, label, highlight }: {
   reading: PillarReading; label: string; highlight?: boolean;
 }) {
@@ -145,7 +174,7 @@ export default function Home() {
   const [gender, setGender] = useState<Gender>('male');
   const [result, setResult] = useState<{
     chart: BaZiChart; reading: ChartReading; structure: RuleHit[]; luck: LuckPillar[]; annual: Pillar; flowYear: number; ageYears: number;
-    strength: StrengthResult; favorable: FavorableResult;
+    strength: StrengthResult; favorable: FavorableResult; personality: PersonalityTrait[];
   } | null>(null);
   const [error, setError] = useState('');
 
@@ -164,12 +193,13 @@ export default function Home() {
       const luck: LuckPillar[] = luckPillars({ ...input, gender });
       const strength: StrengthResult = dayMasterStrength(chart);
       const favorable: FavorableResult = favorableElements(chart);
+      const personality: PersonalityTrait[] = personalityTraits(reading, strength.verdict);
       const now = new Date();
       const flowYear = baziYearAt(now);
       const annual = annualPillar(flowYear);
       const ageYears = (now.getTime() - new Date(`${date}T00:00:00`).getTime()) / 31_557_600_000;
       setError('');
-      setResult({ chart, reading, structure, luck, annual, flowYear, ageYears, strength, favorable });
+      setResult({ chart, reading, structure, luck, annual, flowYear, ageYears, strength, favorable, personality });
     } catch (err) {
       setResult(null);
       setError(err instanceof Error ? err.message : String(err));
@@ -278,6 +308,8 @@ export default function Home() {
           <StructureCard hits={result.structure} />
 
           <StrengthCard strength={result.strength} favorable={result.favorable} />
+
+          <PersonalityCard traits={result.personality} />
 
           <div className="card">
             <h2>Five-element balance 五行 (stems + branches)</h2>

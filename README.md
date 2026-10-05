@@ -106,7 +106,7 @@ npm run dev    # → http://localhost:3000
 - [x] NaYin (纳音) + hidden-stem Ten Gods in chart readings
 - [x] Structural rule evaluation (合/冲/害) with evidence factors + classical citations
 - [x] Luck pillars (大运), annual pillars (流年)
-- [ ] Interpretation engine: Day Master strength (done: 得令/得地/得势 scoring in `packages/engine/src/strength.ts`), favorable elements (done: 喜用神/忌神 + 调候 in `packages/engine/src/favorable.ts`, both shown in the web UI), personality mapping (still open)
+- [ ] Interpretation engine: Day Master strength (done: 得令/得地/得势 scoring in `packages/engine/src/strength.ts`), favorable elements (done: 喜用神/忌神 + 调候 in `packages/engine/src/favorable.ts`, both shown in the web UI), personality mapping (done: top Ten God temperaments in `packages/engine/src/personality.ts`, shown in the web UI)
 - [x] Next.js web app: chart UI, element-balance visualizations (English UI with hanzi/pinyin labels)
 - [ ] Bilingual EN/中文 UI toggle
 - [ ] Saved charts & share links
