@@ -61,6 +61,25 @@ const STR: Record<Lang, Record<string, string>> = {
     forward: '顺行 forward',
     backward: '逆行 backward',
     annual: 'Annual pillar 流年',
+    pillarYear: 'Year 年柱',
+    pillarMonth: 'Month 月柱',
+    pillarDay: 'Day 日柱',
+    pillarHour: 'Hour 时柱',
+    noStructure: 'No stem combinations, branch combinations, clashes, or harms 合/冲/害 found in this chart.',
+    favorable: '喜神 favorable',
+    unfavorable: '忌神 unfavorable',
+    seasonal: '调候 seasonal',
+    strengthNote: 'First-order 扶抑 + 调候 aid from the strength verdict — ',
+    noPersonality: 'No Ten God data to read.',
+    personalityNote: 'Top Ten Gods by count across pillar stems and hidden stems — conventional shorthand hints, not predictions. Expression follows the Day Master strength verdict.',
+    tenGodsNote: 'Counts the four pillar stems plus every hidden stem （藏干） in the four branches, each resolved against the Day Master.',
+    fromYears: 'from',
+    years: 'yrs',
+    luckNote: 'Start ages use the 三天折合一岁 rule (3 days = 1 year) from the birth moment to the neighboring Jie (节) term instant.',
+    vsDayMaster: 'vs Day Master',
+    flowingYear: 'flowing year',
+    annualNote: 'The flowing year begins at Lichun (立春), not January 1.',
+    pageNote: 'Year and month pillars switch at astronomical solar-term instants (computed from the sun\'s apparent ecliptic longitude, accurate to a few minutes). Day and hour pillars use true local solar time from birthplace longitude: the longitude meridian correction plus the equation of time (up to ±16 minutes, Meeus ch. 28) both apply.',
   },
   zh: {
     title: '八字排盘',
@@ -85,15 +104,29 @@ const STR: Record<Lang, Record<string, string>> = {
     forward: '顺行',
     backward: '逆行',
     annual: '流年',
+    pillarYear: '年柱',
+    pillarMonth: '月柱',
+    pillarDay: '日柱',
+    pillarHour: '时柱',
+    noStructure: '本命盘未见干支合、冲、害。',
+    favorable: '喜神',
+    unfavorable: '忌神',
+    seasonal: '调候',
+    strengthNote: '依旺衰给出的扶抑加调候参考——',
+    noPersonality: '暂无十神数据。',
+    personalityNote: '按四柱天干与藏干中出现次数最多的十神排列——传统性格速记，非断语。表达方式依日主旺衰而定。',
+    tenGodsNote: '统计四柱天干与四地支全部藏干，按日主定十神。',
+    fromYears: '自',
+    years: '岁起',
+    luckNote: '起运年龄按三天折合一岁，从出生时刻到相邻节令推算。',
+    vsDayMaster: '对日主',
+    flowingYear: '流年',
+    annualNote: '流年从立春开始，不是从1月1日。',
+    pageNote: '年柱与月柱按天文节气时刻切换（由太阳视黄经计算，误差数分钟）。日柱与时柱使用出生地经度换算的真太阳时：经度时差校正加均时差（最大约±16分钟，Meeus 第28章）两者都适用。',
   },
 };
 
-const PILLAR_LABELS = [
-  { key: 'year', label: 'Year 年柱' },
-  { key: 'month', label: 'Month 月柱' },
-  { key: 'day', label: 'Day 日柱' },
-  { key: 'hour', label: 'Hour 时柱' },
-] as const;
+const PILLAR_KEYS = ['year', 'month', 'day', 'hour'] as const;
 
 const PILLAR_ZH: Record<string, string> = {
   year: '年柱', month: '月柱', day: '日柱', hour: '时柱',
@@ -104,7 +137,7 @@ function StructureCard({ hits, t }: { hits: RuleHit[]; t: Record<string, string>
     <div className="card">
       <h2>{t.structure}</h2>
       {hits.length === 0 ? (
-        <p className="meta">No stem combinations, branch combinations, clashes, or harms 合/冲/害 found in this chart.</p>
+        <p className="meta">{t.noStructure}</p>
       ) : (
         <ul className="rule-list">
           {hits.map((hit, i) => (
@@ -144,26 +177,26 @@ function StrengthCard({ strength, favorable, t }: {
       </ul>
       {favorable.favorable.length > 0 && (
         <p>
-          <b>喜神 favorable:</b>{' '}
+          <b>{t.favorable}:</b>{' '}
           {favorable.favorable.map((a) => `${ELEMENT_HANZI[a.element]} ${a.element}`).join('、')}
           <span className="meta"> — {favorable.favorable.map((a) => a.reason).join('；')}</span>
         </p>
       )}
       {favorable.unfavorable.length > 0 && (
         <p>
-          <b>忌神 unfavorable:</b>{' '}
+          <b>{t.unfavorable}:</b>{' '}
           {favorable.unfavorable.map((a) => `${ELEMENT_HANZI[a.element]} ${a.element}`).join('、')}
           <span className="meta"> — {favorable.unfavorable.map((a) => a.reason).join('；')}</span>
         </p>
       )}
       <p>
-        <b>调候 seasonal:</b>{' '}
+        <b>{t.seasonal}:</b>{' '}
         {favorable.seasonal.element
           ? `${ELEMENT_HANZI[favorable.seasonal.element]} ${favorable.seasonal.element}`
           : '—'}
         <span className="meta"> — {favorable.seasonal.reason}</span>
       </p>
-      <p className="meta">First-order 扶抑 + 调候 aid from the strength verdict — {favorable.source}.</p>
+      <p className="meta">{t.strengthNote}{favorable.source}.</p>
     </div>
   );
 }
@@ -173,24 +206,21 @@ function PersonalityCard({ traits, t }: { traits: PersonalityTrait[]; t: Record<
     <div className="card">
       <h2>{t.personality}</h2>
       {traits.length === 0 ? (
-        <p className="meta">No Ten God data to read.</p>
+        <p className="meta">{t.noPersonality}</p>
       ) : (
         <ul className="rule-list">
-          {traits.map((t) => (
-            <li key={t.god}>
-              <b>{t.god} · {t.english}</b> × {t.count}
+          {traits.map((tr) => (
+            <li key={tr.god}>
+              <b>{tr.god} · {tr.english}</b> × {tr.count}
               <span className="meta">
-                {' '}— {t.keywords.join(' · ')} · {t.keywordsZh.join('、')}
-                {' '}({t.expression} {t.expressionZh})
+                {' '}— {tr.keywords.join(' · ')} · {tr.keywordsZh.join('、')}
+                {' '}({tr.expression} {tr.expressionZh})
               </span>
             </li>
           ))}
         </ul>
       )}
-      <p className="meta">
-        Top Ten Gods by count across pillar stems and hidden stems — conventional
-        shorthand hints, not predictions. Expression follows the Day Master strength verdict.
-      </p>
+      <p className="meta">{t.personalityNote}</p>
     </div>
   );
 }
@@ -343,11 +373,11 @@ export default function Home() {
               {STEMS[result.chart.dayMaster].hanzi} ({STEMS[result.chart.dayMaster].pinyin})
             </h2>
             <div className="pillars">
-              {PILLAR_LABELS.map(({ key, label }) => (
+              {PILLAR_KEYS.map((key) => (
                 <PillarCard
                   key={key}
                   reading={result.reading[key]}
-                  label={label}
+                  label={t[`${key}Pillar`]}
                   highlight={key === 'day'}
                 />
               ))}
@@ -363,10 +393,7 @@ export default function Home() {
                 </span>
               ))}
             </div>
-            <p className="meta">
-              Counts the four pillar stems plus every hidden stem （藏干） in the four branches,
-              each resolved against the Day Master.
-            </p>
+            <p className="meta">{t.tenGodsNote}</p>
           </div>
 
           <StructureCard hits={result.structure} t={t} />
@@ -397,7 +424,7 @@ export default function Home() {
                 return (
                   <div key={i} className={`luck-item${current ? ' current' : ''}`}>
                     <div className="hanzi">{lp.hanzi}</div>
-                    <div className="age">from {lp.startAge.toFixed(1)} yrs</div>
+                    <div className="age">{t.fromYears} {lp.startAge.toFixed(1)} {t.years}</div>
                     <div className="god">{tenGod(result.chart.dayMaster, lp.stem)}</div>
                     <div className="nayin">纳音 {nayinOf(lp.stem, lp.branch).name}</div>
                     <div className="hidden-stems">
@@ -412,10 +439,7 @@ export default function Home() {
                 );
               })}
             </div>
-            <p className="meta">
-              Start ages use the 三天折合一岁 rule (3 days = 1 year) from the birth moment to the
-              neighboring Jie (节) term instant.
-            </p>
+            <p className="meta">{t.luckNote}</p>
           </div>
 
           <div className="card">
@@ -423,12 +447,12 @@ export default function Home() {
             <p style={{ fontSize: '1.5rem', fontWeight: 700, margin: '0.25rem 0' }}>
               {result.annual.hanzi}{' '}
               <span style={{ fontSize: '0.9rem', fontWeight: 400, color: 'var(--muted)' }}>
-                {STEMS[result.annual.stem].pinyin} {BRANCHES[result.annual.branch].pinyin} · flowing year {result.flowYear}
+                {STEMS[result.annual.stem].pinyin} {BRANCHES[result.annual.branch].pinyin} · {t.flowingYear} {result.flowYear}
               </span>
             </p>
             <p className="meta">
               {tenGod(result.chart.dayMaster, result.annual.stem)}{' '}
-              {TEN_GOD_INFO[tenGod(result.chart.dayMaster, result.annual.stem)].english} vs Day Master · 纳音{' '}
+              {TEN_GOD_INFO[tenGod(result.chart.dayMaster, result.annual.stem)].english} {t.vsDayMaster} · 纳音{' '}
               {nayinOf(result.annual.stem, result.annual.branch).name}
             </p>
             <p className="meta">
@@ -439,15 +463,10 @@ export default function Home() {
                 </span>
               ))}
             </p>
-            <p className="meta">The flowing year begins at Lichun (立春), not January 1.</p>
+            <p className="meta">{t.annualNote}</p>
           </div>
 
-          <p className="note">
-            Year and month pillars switch at astronomical solar-term instants (computed from the
-            sun&apos;s apparent ecliptic longitude, accurate to a few minutes). Day and hour pillars
-            use true local solar time from birthplace longitude: the longitude meridian correction
-            plus the equation of time (up to ±16 minutes, Meeus ch. 28) both apply.
-          </p>
+          <p className="note">{t.pageNote}</p>
         </>
       )}
     </>
