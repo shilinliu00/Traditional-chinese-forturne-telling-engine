@@ -5,7 +5,7 @@
  */
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { calculateBaZi, dayPillarIndex } from '../src/pillars.ts';
+import { calculateBaZi, dayPillarIndex, baziYearAt } from '../src/pillars.ts';
 import { lichunInstant, solarTermInstant, jieBranchAt } from '../src/solarTerms.ts';
 
 describe('term boundaries', () => {
@@ -38,6 +38,32 @@ describe('term boundaries', () => {
     // Direct instant-level check: the boundary is inclusive at the instant.
     assert.equal(jieBranchAt(new Date(instant.getTime() - 1)), 2);
     assert.equal(jieBranchAt(instant), 3);
+  });
+});
+
+describe('baziYearAt', () => {
+  it('returns the previous Gregorian year just before the Lichun instant', () => {
+    const instant = lichunInstant(2024); // 2024-02-04 08:21 UTC
+    assert.equal(baziYearAt(new Date(instant.getTime() - 60_000)), 2023);
+  });
+
+  it('returns the current Gregorian year just after the Lichun instant', () => {
+    const instant = lichunInstant(2024);
+    assert.equal(baziYearAt(new Date(instant.getTime() + 60_000)), 2024);
+  });
+
+  it('is inclusive exactly at the Lichun instant', () => {
+    const instant = lichunInstant(2024);
+    assert.equal(baziYearAt(instant), 2024);
+  });
+
+  it('agrees with the year pillar of calculateBaZi across the boundary', () => {
+    const before = calculateBaZi({ date: '2024-02-04', time: '08:20', utcOffsetMinutes: 0 });
+    const after = calculateBaZi({ date: '2024-02-04', time: '08:22', utcOffsetMinutes: 0 });
+    assert.equal(baziYearAt(new Date(Date.UTC(2024, 1, 4, 8, 20))), 2023);
+    assert.equal(baziYearAt(new Date(Date.UTC(2024, 1, 4, 8, 22))), 2024);
+    assert.equal(before.year.hanzi, '癸卯');
+    assert.equal(after.year.hanzi, '甲辰');
   });
 });
 
