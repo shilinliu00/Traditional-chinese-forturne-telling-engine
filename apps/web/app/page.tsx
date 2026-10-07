@@ -1,10 +1,12 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   calculateBaZi,
   readChart,
   evaluateRules,
+  encodeShareParams,
+  decodeShareParams,
   elementBalance,
   luckPillars,
   dayMasterStrength,
@@ -50,6 +52,8 @@ const STR: Record<Lang, Record<string, string>> = {
     male: 'Male 男',
     female: 'Female 女',
     calculate: 'Calculate 排盘',
+    copyLink: 'Copy share link',
+    linkCopied: 'Share link copied to clipboard.',
     fourPillars: 'Four pillars 四柱',
     dayMaster: 'Day Master 日主',
     tenGods: 'Ten Gods 十神 · stems and hidden stems',
@@ -93,6 +97,8 @@ const STR: Record<Lang, Record<string, string>> = {
     male: '男',
     female: '女',
     calculate: '排盘',
+    copyLink: '复制分享链接',
+    linkCopied: '分享链接已复制到剪贴板。',
     fourPillars: '四柱',
     dayMaster: '日主',
     tenGods: '十神',
@@ -262,15 +268,15 @@ export default function Home() {
     strength: StrengthResult; favorable: FavorableResult; personality: PersonalityTrait[];
   } | null>(null);
   const [error, setError] = useState('');
+  const [copied, setCopied] = useState(false);
 
-  function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
+  function computeWith(d: string, tm: string, uo: string, lon: string, g: Gender) {
     try {
       const input = {
-        date,
-        time,
-        longitude: longitude.trim() === '' ? undefined : Number(longitude),
-        utcOffsetMinutes: Number(utcOffset) * 60,
+        date: d,
+        time: tm,
+        longitude: lon.trim() === '' ? undefined : Number(lon),
+        utcOffsetMinutes: Number(uo) * 60,
       };
       const chart: BaZiChart = calculateBaZi(input);
       const reading: ChartReading = readChart(input);
@@ -282,13 +288,60 @@ export default function Home() {
       const now = new Date();
       const flowYear = baziYearAt(now);
       const annual = annualPillar(flowYear);
-      const ageYears = (now.getTime() - new Date(`${date}T00:00:00`).getTime()) / 31_557_600_000;
+      const ageYears = (now.getTime() - new Date(`${d}T00:00:00`).getTime()) / 31_557_600_000;
       setError('');
       setResult({ chart, reading, structure, luck, annual, flowYear, ageYears, strength, favorable, personality });
     } catch (err) {
       setResult(null);
       setError(err instanceof Error ? err.message : String(err));
     }
+  }
+
+  function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    computeWith(date, time, utcOffset, longitude, gender);
+  }
+
+  // Prefill the form from a share link, and run the chart right away.
+  useEffect(() => {
+    const params = decodeShareParams(window.location.search);
+    if (!params) return;
+    setDate(params.date);
+    setTime(params.time);
+    setUtcOffset(String(params.utcOffset));
+    setLongitude(params.longitude === undefined ? '' : String(params.longitude));
+    setGender(params.gender);
+    setLang(params.lang);
+    computeWith(
+      params.date,
+      params.time,
+      String(params.utcOffset),
+      params.longitude === undefined ? '' : String(params.longitude),
+      params.gender,
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  function handleCopyLink() {
+    const lon = longitude.trim();
+    const params = encodeShareParams({
+      date,
+      time,
+      utcOffset: Number(utcOffset),
+      longitude: lon === '' ? undefined : Number(lon),
+      gender,
+      lang,
+    });
+    const link = `${window.location.origin}${window.location.pathname}?${params}`;
+    navigator.clipboard
+      .writeText(link)
+      .then(() => {
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+      })
+      .catch(() => {
+        window.prompt(t.linkCopied, link);
+      });
   }
 
   const offsets: string[] = [];
@@ -361,6 +414,9 @@ export default function Home() {
             </div>
           </div>
           <button className="primary" type="submit">{t.calculate}</button>
+          <button type="button" onClick={handleCopyLink} style={{ marginLeft: '0.5rem' }}>
+            {copied ? t.linkCopied : t.copyLink}
+          </button>
         </form>
         {error && <p style={{ color: '#a33' }}>{error}</p>}
       </div>
