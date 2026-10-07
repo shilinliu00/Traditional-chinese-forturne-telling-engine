@@ -14,6 +14,7 @@ export * from './pillars.ts';
 export * from './luckPillars.ts';
 export * from './reading.ts';
 export * from './rules.ts';
+export * from './share.ts';
 export * from './strength.ts';
 export * from './favorable.ts';
 export * from './personality.ts';
