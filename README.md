@@ -79,6 +79,20 @@ npm install
 npm run dev    # → http://localhost:3000
 ```
 
+## Share links
+
+A chart can be shared as a plain link — the web UI reads the birth inputs from
+the URL query string on load, pre-fills the form, and runs the chart:
+
+```
+/?date=2000-12-01&time=07:30&tz=-5&lon=-73.9&gender=female&lang=en
+```
+
+`encodeShareParams` / `decodeShareParams` in `packages/engine/src/share.ts` build
+and validate the query string (bad values decode to `null` and the link is
+ignored). The "Copy share link" button in the UI generates the link from the
+current form inputs.
+
 ## Calculation highlights
 
 - **Year pillar** changes at the astronomical instant of Lichun (立春 ≈ Feb 4), not Jan 1 or Lunar New Year — the classic beginner trap, handled to the minute.
@@ -109,4 +123,4 @@ npm run dev    # → http://localhost:3000
 - [x] Interpretation engine: Day Master strength (得令/得地/得势 scoring in `packages/engine/src/strength.ts`), favorable elements (喜用神/忌神 + 调候 in `packages/engine/src/favorable.ts`), personality mapping (top Ten God temperaments in `packages/engine/src/personality.ts`) — all shown in the web UI
 - [x] Next.js web app: chart UI, element-balance visualizations (English UI with hanzi/pinyin labels)
 - [x] Bilingual EN/中文 UI toggle: full STR dictionary in `apps/web/app/page.tsx` covers headings, form labels, and all card body text
-- [ ] Saved charts & share links
+- [x] Shareable chart links: birth inputs encoded as URL query params (`encodeShareParams`/`decodeShareParams` in `packages/engine/src/share.ts` with validation tests), pre-filled + auto-run on load, "Copy share link" button in the web UI
