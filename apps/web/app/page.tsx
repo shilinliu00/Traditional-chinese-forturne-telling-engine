@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import {
   calculateBaZi,
+  birthInstantUtc,
   readChart,
   evaluateRules,
   encodeShareParams,
@@ -290,7 +291,7 @@ export default function Home() {
       const now = new Date();
       const flowYear = baziYearAt(now);
       const annual = annualPillar(flowYear);
-      const ageYears = (now.getTime() - new Date(`${d}T00:00:00`).getTime()) / 31_557_600_000;
+      const ageYears = (now.getTime() - birthInstantUtc(input).getTime()) / 31_557_600_000;
       setError('');
       setResult({ chart, reading, structure, luck, annual, flowYear, ageYears, strength, favorable, personality });
     } catch (err) {
