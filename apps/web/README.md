@@ -24,3 +24,20 @@ npm run build # production build
 - Luck pillars (大运) timeline with fractional start ages; the current pillar
   is highlighted based on the native's age.
 - Current annual pillar (流年), computed from the BaZi year of today.
+
+## Share links
+
+The "Copy share link" button encodes the form inputs as query params so a
+chart can be bookmarked or sent as a link; the form pre-fills and runs
+automatically when the link opens.
+
+- `date` — birth date, `YYYY-MM-DD` (validated as a real calendar date)
+- `time` — clock time, `HH:mm`
+- `tz` — clock-timezone UTC offset in hours, halves allowed (`-12`..`14`)
+- `lon` — birthplace longitude °E, `-180`..`180` (omit for clock time)
+- `gender` — `male` or `female` (luck-pillar direction)
+- `lang` — `en` or `zh`
+
+A link with any missing or malformed value is ignored and the form keeps its
+defaults. Encode/decode logic lives in `packages/engine/src/share.ts` with
+validation tests.
