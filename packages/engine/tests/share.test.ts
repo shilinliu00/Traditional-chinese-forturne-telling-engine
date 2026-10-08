@@ -73,8 +73,13 @@ describe('share links', () => {
     }
   });
 
-  it('rejects unknown gender or lang values', () => {
-    const base = { date: '2000-12-01', time: '07:30', lang: 'en' } as const;
+  it('treats an empty lon param as omitted', () => {
+    const base = { date: '2000-12-01', time: '07:30', gender: 'male', lang: 'en' } as const;
+    const got = decodeShareParams(new URLSearchParams({ ...base, lon: '' }).toString());
+    assert.equal(got?.longitude, undefined);
+  });
+
+  it('rejects unknown gender or lang values', () => {    const base = { date: '2000-12-01', time: '07:30', lang: 'en' } as const;
     assert.equal(decodeShareParams(new URLSearchParams({ ...base, gender: 'x' }).toString()), null);
     assert.equal(decodeShareParams(new URLSearchParams({ ...base, gender: 'male', lang: 'fr' }).toString()), null);
   });
