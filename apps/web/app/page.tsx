@@ -54,6 +54,7 @@ const STR: Record<Lang, Record<string, string>> = {
     calculate: 'Calculate 排盘',
     copyLink: 'Copy share link',
     linkCopied: 'Share link copied to clipboard.',
+    copyManually: 'Clipboard unavailable — copy this link manually:',
     fourPillars: 'Four pillars 四柱',
     dayMaster: 'Day Master 日主',
     tenGods: 'Ten Gods 十神 · stems and hidden stems',
@@ -99,6 +100,7 @@ const STR: Record<Lang, Record<string, string>> = {
     calculate: '排盘',
     copyLink: '复制分享链接',
     linkCopied: '分享链接已复制到剪贴板。',
+    copyManually: '剪贴板不可用——请手动复制此链接：',
     fourPillars: '四柱',
     dayMaster: '日主',
     tenGods: '十神',
@@ -333,15 +335,22 @@ export default function Home() {
       lang,
     });
     const link = `${window.location.origin}${window.location.pathname}?${params}`;
-    navigator.clipboard
-      .writeText(link)
-      .then(() => {
-        setCopied(true);
-        setTimeout(() => setCopied(false), 2000);
-      })
-      .catch(() => {
-        window.prompt(t.linkCopied, link);
-      });
+    // navigator.clipboard is missing in insecure contexts (plain http);
+    // the prompt fallback must not claim the link was copied.
+    const clipboard = typeof navigator !== 'undefined' ? navigator.clipboard : undefined;
+    if (clipboard?.writeText) {
+      clipboard
+        .writeText(link)
+        .then(() => {
+          setCopied(true);
+          setTimeout(() => setCopied(false), 2000);
+        })
+        .catch(() => {
+          window.prompt(t.copyManually, link);
+        });
+    } else {
+      window.prompt(t.copyManually, link);
+    }
   }
 
   const offsets: string[] = [];
