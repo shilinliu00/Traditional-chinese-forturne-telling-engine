@@ -69,6 +69,13 @@ const strength = dayMasterStrength(chart);
 const fav = favorableElements(chart);
 // → { verdictHanzi: '身旺', favorable: [火(食伤泄秀), 金(官杀制身), 土(财星耗身)],
 //     unfavorable: [水(印), 木(比劫)], seasonal: { element: null, … } }
+
+// Personality mapping: top Ten God temperaments, counted across pillar
+// stems and hidden stems, with the strength verdict modulating expression
+import { personalityTraits } from './packages/engine/src/index.ts';
+const traits = personalityTraits(reading, strength.verdict);
+// → [{ god: '正印', count: 3, keywords: ['kind','patient','traditional'], … },
+//    { god: '比肩', count: 2, … }, { god: '七杀', count: 1, … }]
 ```
 
 ## Run the web app
