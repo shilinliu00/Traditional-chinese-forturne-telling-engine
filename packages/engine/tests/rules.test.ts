@@ -91,4 +91,19 @@ describe('rule evaluation', () => {
     const hits = evaluateRules(chart([[0, 0], [2, 0], [4, 4], [6, 4]]));
     assert.deepEqual(hits, []);
   });
+
+  it('reports overlapping patterns independently', () => {
+    // 甲申 / 乙子 / 丙辰 / 丁丑: 子 belongs to both 申子辰合水局 and
+    // 子丑合土 — each pattern gets its own hit with its own evidence.
+    // Stems 甲乙丙丁 form no 五合, and no 冲/害 pairs are present.
+    const hits = evaluateRules(chart([[0, 8], [1, 0], [2, 4], [3, 1]]));
+    assert.equal(hits.length, 2);
+    assert.equal(hits[0].rule, 'branch-six-combination');
+    assert.equal(hits[0].pattern, '子丑合土');
+    assert.deepEqual(hits[0].pillars, ['month', 'hour']);
+    assert.equal(hits[1].rule, 'triple-combination');
+    assert.equal(hits[1].pattern, '申子辰合水局');
+    assert.deepEqual(hits[1].pillars, ['year', 'month', 'day']);
+    assert.ok(hits.every((h) => h.source === '《三命通会》'));
+  });
 });
