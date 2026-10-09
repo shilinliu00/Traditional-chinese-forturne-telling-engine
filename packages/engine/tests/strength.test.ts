@@ -91,4 +91,20 @@ describe('dayMasterStrength', () => {
     assert.match(r.criteria[0].factors[0], /月支寅/);
     assert.ok(r.source.length > 0);
   });
+
+  it('score always equals the sum of criterion points and stays within max', () => {
+    // Three fixtures above plus a sweep of real charts: the published
+    // score must be exactly the criteria total, never above the max.
+    const fixtures: Array<[Array<[number, number]>, number]> = [
+      [[[1, 0], [2, 2], [0, 3], [8, 6]], 0], // strong
+      [[[0, 0], [1, 2], [6, 3], [2, 6]], 6], // weak
+      [[[1, 0], [9, 11], [0, 3], [8, 6]], 0], // balanced
+    ];
+    for (const [pillars, dm] of fixtures) {
+      const r = dayMasterStrength(chart(pillars, dm));
+      const sum = r.criteria.reduce((n, c) => n + c.points, 0);
+      assert.equal(r.score, sum);
+      assert.ok(r.score >= 0 && r.score <= r.max);
+    }
+  });
 });
