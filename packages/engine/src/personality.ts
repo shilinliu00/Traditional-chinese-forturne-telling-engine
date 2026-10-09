@@ -64,7 +64,8 @@ export function countTenGods(reading: ChartReading): Record<TenGod, number> {
 
 /**
  * Top three dominant Ten God temperaments for a chart reading,
- * ranked by occurrence count (ties break alphabetically for stability).
+ * ranked by occurrence count (ties break in hanzi code point order for
+ * stability, since the keys are hanzi rather than an alphabet).
  */
 export function personalityTraits(
   reading: ChartReading,

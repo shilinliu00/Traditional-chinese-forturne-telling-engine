@@ -62,3 +62,23 @@ test('no zero count god appears in the top traits', () => {
   const traits = personalityTraits(reading, 'strong');
   for (const t of traits) assert.ok(t.count > 0);
 });
+
+test('ties break in hanzi code point order, deterministically', () => {
+  // 2000-06-15 12:00 (庚辰 壬午 甲辰 庚午): six gods tie at count 2 —
+  // 劫财, 伤官, 偏财, 正财, 七杀, 正印. 七 (U+4E03) < 伤 (U+4F24) <
+  // 偏 (U+504F), so the top three are stable across calls.
+  const first = personalityTraits(
+    readChart({ date: '2000-06-15', time: '12:00' }),
+    'balanced',
+  );
+  const second = personalityTraits(
+    readChart({ date: '2000-06-15', time: '12:00' }),
+    'balanced',
+  );
+  assert.deepEqual(first.map((t) => t.god), ['七杀', '伤官', '偏财']);
+  assert.deepEqual(
+    first.map((t) => t.god),
+    second.map((t) => t.god),
+    'tie order must be stable',
+  );
+});
