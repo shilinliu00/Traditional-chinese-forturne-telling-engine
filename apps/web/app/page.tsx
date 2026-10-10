@@ -17,6 +17,7 @@ import {
   tenGod,
   nayinOf,
   personalityTraits,
+  countTenGods,
   TEN_GOD_INFO,
   STEMS,
   BRANCHES,
@@ -359,16 +360,7 @@ export default function Home() {
 
   const godCounts: Array<{ god: TenGod; count: number }> = result
     ? (Object.keys(TEN_GOD_INFO) as TenGod[])
-        .map((g) => ({
-          god: g,
-          count: (['year', 'month', 'day', 'hour'] as const).reduce(
-            (n, k) =>
-              n +
-              (result.reading[k].tenGod === g ? 1 : 0) +
-              result.reading[k].hiddenGods.filter((h) => h === g).length,
-            0,
-          ),
-        }))
+        .map((g) => ({ god: g, count: countTenGods(result.reading)[g] }))
         .filter((x) => x.count > 0)
     : [];
 
