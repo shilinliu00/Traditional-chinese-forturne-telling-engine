@@ -284,7 +284,7 @@ export default function Home() {
       const chart: BaZiChart = calculateBaZi(input);
       const reading: ChartReading = readChart(input);
       const structure: RuleHit[] = evaluateRules(chart);
-      const luck: LuckPillar[] = luckPillars({ ...input, gender });
+      const luck: LuckPillar[] = luckPillars({ ...input, gender: g });
       const strength: StrengthResult = dayMasterStrength(chart);
       const favorable: FavorableResult = favorableElements(chart);
       const personality: PersonalityTrait[] = personalityTraits(reading, strength.verdict);
