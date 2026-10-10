@@ -27,6 +27,11 @@ describe('share links', () => {
     assert.deepEqual(decodeShareParams(encodeShareParams(noLon)), noLon);
   });
 
+  it('round-trips a half hour timezone offset', () => {
+    const halfHour: ShareParams = { ...SAMPLE, utcOffset: 5.5 };
+    assert.deepEqual(decodeShareParams(encodeShareParams(halfHour)), halfHour);
+  });
+
   it('accepts a leading question mark', () => {
     assert.deepEqual(decodeShareParams('?' + encodeShareParams(SAMPLE)), SAMPLE);
   });
