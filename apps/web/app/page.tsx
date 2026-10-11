@@ -77,6 +77,7 @@ const STR: Record<Lang, Record<string, string>> = {
     unfavorable: '忌神 unfavorable',
     seasonal: '调候 seasonal',
     strengthNote: 'First-order 扶抑 + 调候 aid from the strength verdict — ',
+    score: 'score',
     noPersonality: 'No Ten God data to read.',
     personalityNote: 'Top Ten Gods by count across pillar stems and hidden stems — conventional shorthand hints, not predictions. Expression follows the Day Master strength verdict.',
     tenGodsNote: 'Counts the four pillar stems plus every hidden stem （藏干） in the four branches, each resolved against the Day Master.',
@@ -123,6 +124,7 @@ const STR: Record<Lang, Record<string, string>> = {
     unfavorable: '忌神',
     seasonal: '调候',
     strengthNote: '依旺衰给出的扶抑加调候参考——',
+    score: '得分',
     noPersonality: '暂无十神数据。',
     personalityNote: '按四柱天干与藏干中出现次数最多的十神排列——传统性格速记，非断语。表达方式依日主旺衰而定。',
     tenGodsNote: '统计四柱天干与四地支全部藏干，按日主定十神。',
@@ -183,7 +185,7 @@ function StrengthCard({ strength, favorable, t }: {
       <p style={{ fontSize: '1.25rem', fontWeight: 700, margin: '0.25rem 0' }}>
         日主 {strength.dayMasterHanzi}（{ELEMENT_HANZI[strength.element]}）· {strength.verdictHanzi}
         <span style={{ fontSize: '0.9rem', fontWeight: 400, color: 'var(--muted)' }}>
-          {' '}score {strength.score} / {strength.max}
+          {' '}{t.score} {strength.score} / {strength.max}
         </span>
       </p>
       <ul className="rule-list">
