@@ -81,7 +81,7 @@ describe('timezone handling', () => {
     assert.equal(beijing.day.hanzi, utc.day.hanzi);
   });
 
-  it('half hour offsets resolve the same UTC instant (India, Nepal, Newfoundland)', () => {
+  it('half and quarter hour offsets resolve the same UTC instant (India, Nepal, Newfoundland)', () => {
     // 2024-01-01 12:00 UTC seen from UTC+5:30 (17:30), UTC+5:45 (17:45),
     // and UTC-3:30 (08:30). Year, month and day follow the UTC instant;
     // the hour branch follows local clock time when no longitude is given.
@@ -96,7 +96,7 @@ describe('timezone handling', () => {
     }
   });
 
-  it('longitude corrected solar time agrees across half hour offsets', () => {
+  it('longitude corrected solar time agrees across half and quarter hour offsets', () => {
     // Same instant (2024-01-01 12:00 UTC) and same birthplace longitude:
     // the meridian now derives from each clock timezone's own offset,
     // so solar time — and all four pillars — must match.

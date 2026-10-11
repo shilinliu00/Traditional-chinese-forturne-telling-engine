@@ -33,7 +33,7 @@ automatically when the link opens.
 
 - `date` — birth date, `YYYY-MM-DD` (validated as a real calendar date)
 - `time` — clock time, `HH:mm`
-- `tz` — clock-timezone UTC offset in hours, halves allowed (`-12`..`14`)
+- `tz` — clock-timezone UTC offset in hours, quarters allowed (`-12`..`14`, e.g. Nepal `5.75`)
 - `lon` — birthplace longitude °E, `-180`..`180` (omit for clock time)
 - `gender` — `male` or `female` (luck-pillar direction)
 - `lang` — `en` or `zh`

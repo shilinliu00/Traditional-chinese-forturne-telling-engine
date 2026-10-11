@@ -11,7 +11,7 @@ export interface ShareParams {
   date: string;
   /** Local clock time, 'HH:mm' (24h). */
   time: string;
-  /** Clock timezone offset from UTC in hours (-12..14, halves allowed). */
+  /** Clock timezone offset from UTC in hours (-12..14, quarters allowed, e.g. Nepal +5:45). */
   utcOffset: number;
   /** Birthplace longitude in degrees East (-180..180). Omit for clock time. */
   longitude?: number;
@@ -44,7 +44,7 @@ function validTime(s: string | null): s is string {
 }
 
 function validOffset(n: number): boolean {
-  return Number.isFinite(n) && n >= -12 && n <= 14 && n * 2 === Math.round(n * 2);
+  return Number.isFinite(n) && n >= -12 && n <= 14 && n * 4 === Math.round(n * 4);
 }
 
 function validLongitude(n: number): boolean {

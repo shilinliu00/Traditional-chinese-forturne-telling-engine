@@ -32,6 +32,13 @@ describe('share links', () => {
     assert.deepEqual(decodeShareParams(encodeShareParams(halfHour)), halfHour);
   });
 
+  it('round-trips quarter hour timezone offsets (Nepal, Chatham)', () => {
+    for (const utcOffset of [5.75, 12.75]) {
+      const params: ShareParams = { ...SAMPLE, utcOffset };
+      assert.deepEqual(decodeShareParams(encodeShareParams(params)), params, String(utcOffset));
+    }
+  });
+
   it('accepts a leading question mark', () => {
     assert.deepEqual(decodeShareParams('?' + encodeShareParams(SAMPLE)), SAMPLE);
   });
@@ -67,11 +74,12 @@ describe('share links', () => {
 
   it('rejects out-of-range timezones and longitudes', () => {
     const base = { date: '2000-12-01', time: '07:30', gender: 'male', lang: 'en' } as const;
-    for (const tz of ['15', '-13', '5.25', 'abc']) {
+    for (const tz of ['15', '-13', '5.1', 'abc']) {
       const q = new URLSearchParams({ ...base, tz });
       assert.equal(decodeShareParams(q.toString()), null, tz);
     }
     assert.deepEqual(decodeShareParams(new URLSearchParams({ ...base, tz: '5.5' }).toString())?.utcOffset, 5.5);
+    assert.deepEqual(decodeShareParams(new URLSearchParams({ ...base, tz: '5.75' }).toString())?.utcOffset, 5.75);
     for (const lon of ['181', '-180.1', 'abc']) {
       const q = new URLSearchParams({ ...base, lon });
       assert.equal(decodeShareParams(q.toString()), null, lon);
