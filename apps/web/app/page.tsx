@@ -138,6 +138,15 @@ const STR: Record<Lang, Record<string, string>> = {
 
 const PILLAR_KEYS = ['year', 'month', 'day', 'hour'] as const;
 
+/** Render a decimal UTC offset as UTC+5:45; whole hours stay UTC+8. */
+function formatUtcOffset(o: string): string {
+  const sign = o.startsWith('-') ? '-' : '+';
+  const abs = Math.abs(Number(o));
+  const hours = Math.floor(abs);
+  const minutes = Math.round((abs - hours) * 60);
+  return minutes === 0 ? `UTC${sign}${hours}` : `UTC${sign}${hours}:${String(minutes).padStart(2, '0')}`;
+}
+
 const PILLAR_ZH: Record<string, string> = {
   year: '年柱', month: '月柱', day: '日柱', hour: '时柱',
 };
@@ -356,7 +365,7 @@ export default function Home() {
   }
 
   const offsets: string[] = [];
-  for (let h = -12; h <= 14; h += 0.5) offsets.push(String(h));
+  for (let q = -48; q <= 56; q++) offsets.push(String(q / 4)); // -12..14 in quarter hours
 
   const godCounts: Array<{ god: TenGod; count: number }> = result
     ? (Object.keys(TEN_GOD_INFO) as TenGod[])
@@ -397,7 +406,7 @@ export default function Home() {
               <select value={utcOffset} onChange={(e) => setUtcOffset(e.target.value)}>
                 {offsets.map((o) => (
                   <option key={o} value={o}>
-                    UTC{o.startsWith('-') ? o : `+${o}`}
+                    {formatUtcOffset(o)}
                   </option>
                 ))}
               </select>
