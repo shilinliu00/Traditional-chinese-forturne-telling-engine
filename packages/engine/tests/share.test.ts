@@ -5,6 +5,7 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { encodeShareParams, decodeShareParams, type ShareParams } from '../src/share.ts';
+import { calculateBaZi } from '../src/pillars.ts';
 
 const SAMPLE: ShareParams = {
   date: '2000-12-01',
@@ -84,6 +85,18 @@ describe('share links', () => {
       const q = new URLSearchParams({ ...base, lon });
       assert.equal(decodeShareParams(q.toString()), null, lon);
     }
+  });
+
+  it('a nepal share link drives the same chart as utcOffsetMinutes 345', () => {
+    const params = decodeShareParams('date=2000-12-01&time=07:30&tz=5.75&gender=male&lang=en');
+    assert.ok(params);
+    const fromLink = calculateBaZi({
+      date: params.date,
+      time: params.time,
+      utcOffsetMinutes: params.utcOffset * 60,
+    });
+    const direct = calculateBaZi({ date: '2000-12-01', time: '07:30', utcOffsetMinutes: 345 });
+    assert.deepEqual(fromLink, direct);
   });
 
   it('treats an empty lon param as omitted', () => {
