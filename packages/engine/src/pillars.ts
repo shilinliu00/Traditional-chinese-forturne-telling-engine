@@ -37,11 +37,13 @@ export interface BirthInput {
   /** Standard meridian of the clock timezone in degrees East.
    * Defaults to the utcOffsetMinutes meridian (offset/15), or 120 = Beijing
    * time when no offset is given. Needed so longitude correction stays
-   * consistent when the same instant is given in different timezones. */
+   * consistent when the same instant is given in different timezones.
+   * Must be within -180..210 (the meridians of UTC-12..UTC+14). */
   meridian?: number;
   /**
    * Clock timezone's offset from UTC in minutes (e.g. 480 = UTC+8).
    * Defaults to `meridian / 15 * 60`, which is exact for whole/hour-offset zones.
+   * Must be within -720..840 (UTC-12..UTC+14, the full range of real zones).
    */
   utcOffsetMinutes?: number;
 }
@@ -107,6 +109,24 @@ function parseLongitude(longitude: number | undefined): number | undefined {
 }
 
 /**
+ * The clock timezone's UTC offset in minutes, validated like the other
+ * parsed inputs: a NaN or absurd offset (e.g. 99999) would silently shift
+ * the birth instant by days and corrupt every pillar, so reject it here.
+ * UTC-12..UTC+14 (-720..840 minutes) is the full range of real civil zones.
+ */
+function parseClockOffset(input: BirthInput): number {
+  const meridian = input.meridian;
+  if (meridian !== undefined && (!Number.isFinite(meridian) || meridian < -180 || meridian > 210)) {
+    throw new Error(`Invalid meridian '${meridian}': must be a number between -180 and 210.`);
+  }
+  const offset = input.utcOffsetMinutes ?? ((meridian ?? 120) / 15) * 60;
+  if (!Number.isFinite(offset) || offset < -720 || offset > 840) {
+    throw new Error(`Invalid UTC offset '${offset}': must be between -720 and 840 minutes.`);
+  }
+  return offset;
+}
+
+/**
  * The birth moment as a UTC instant, from local clock time and the clock
  * timezone's UTC offset. Year/month pillar boundaries (solar-term instants)
  * are compared against this moment.
@@ -114,7 +134,7 @@ function parseLongitude(longitude: number | undefined): number | undefined {
 export function birthInstantUtc(input: BirthInput): Date {
   const { y, m, d } = parseDate(input.date);
   const { hh, mm } = parseTime(input.time);
-  const offset = input.utcOffsetMinutes ?? ((input.meridian ?? 120) / 15) * 60;
+  const offset = parseClockOffset(input);
   return new Date(Date.UTC(y, m - 1, d, hh, mm) - offset * 60_000);
 }
 

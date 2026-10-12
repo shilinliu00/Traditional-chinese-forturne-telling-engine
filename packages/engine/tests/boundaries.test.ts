@@ -170,6 +170,34 @@ describe('input validation', () => {
     const c = calculateBaZi({ date: '2024-01-01', time: '12:00' });
     assert.equal(c.hour.hanzi, '庚午');
   });
+
+  it('rejects a non numeric or out of range clock timezone offset', () => {
+    for (const utcOffsetMinutes of [NaN, -721, 841, 99999, Infinity]) {
+      assert.throws(
+        () => calculateBaZi({ date: '2024-01-01', time: '12:00', utcOffsetMinutes }),
+        /Invalid UTC offset/,
+        `offset ${utcOffsetMinutes}`,
+      );
+    }
+  });
+
+  it('rejects a non numeric or out of range clock meridian', () => {
+    for (const meridian of [NaN, -181, 211, 999]) {
+      assert.throws(
+        () => calculateBaZi({ date: '2024-01-01', time: '12:00', meridian }),
+        /Invalid meridian/,
+        `meridian ${meridian}`,
+      );
+    }
+  });
+
+  it('still accepts the real world clock zones at the edges', () => {
+    // UTC-12 and UTC+14 are the extremes of civil time.
+    const west = calculateBaZi({ date: '2024-01-01', time: '12:00', utcOffsetMinutes: -720 });
+    const east = calculateBaZi({ date: '2024-01-01', time: '12:00', utcOffsetMinutes: 840 });
+    assert.equal(west.day.hanzi, '甲子');
+    assert.equal(east.day.hanzi, '甲子');
+  });
 });
 
 describe('leap-day continuity', () => {
