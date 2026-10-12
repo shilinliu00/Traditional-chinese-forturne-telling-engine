@@ -105,6 +105,12 @@ describe('share links', () => {
     assert.equal(got?.longitude, undefined);
   });
 
+  it('treats an empty tz param as omitted (defaults to UTC+8)', () => {
+    const base = { date: '2000-12-01', time: '07:30', gender: 'male', lang: 'en' } as const;
+    const got = decodeShareParams(new URLSearchParams({ ...base, tz: '' }).toString());
+    assert.equal(got?.utcOffset, 8);
+  });
+
   it('rejects unknown gender or lang values', () => {    const base = { date: '2000-12-01', time: '07:30', lang: 'en' } as const;
     assert.equal(decodeShareParams(new URLSearchParams({ ...base, gender: 'x' }).toString()), null);
     assert.equal(decodeShareParams(new URLSearchParams({ ...base, gender: 'male', lang: 'fr' }).toString()), null);

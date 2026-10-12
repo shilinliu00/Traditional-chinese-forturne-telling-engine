@@ -83,7 +83,9 @@ export function decodeShareParams(query: string): ShareParams | null {
   if (!validDate(date) || !validTime(time)) return null;
 
   const tzRaw = q.get('tz');
-  const utcOffset = tzRaw === null ? 8 : Number(tzRaw);
+  // An empty tz param counts as omitted (like the empty lon param below),
+  // so a hand edited link does not silently land on UTC+0.
+  const utcOffset = tzRaw === null || tzRaw === '' ? 8 : Number(tzRaw);
   if (!validOffset(utcOffset)) return null;
 
   const lonRaw = q.get('lon');
