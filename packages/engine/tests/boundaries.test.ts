@@ -150,6 +150,28 @@ describe('late zi hour (晚子时)', () => {
   });
 });
 
+describe('input validation', () => {
+  it('rejects a non numeric or out of range longitude with a clear error', () => {
+    for (const longitude of [NaN, 181, -180.1, 999, Infinity]) {
+      assert.throws(
+        () => calculateBaZi({ date: '2024-01-01', time: '12:00', longitude }),
+        /Invalid longitude/,
+        `longitude ${longitude}`,
+      );
+    }
+  });
+
+  it('accepts the full physical longitude range, including the edges', () => {
+    for (const longitude of [-180, -73.9, 0, 116.4, 180]) {
+      const c = calculateBaZi({ date: '2024-01-01', time: '12:00', longitude, utcOffsetMinutes: 480 });
+      assert.ok(c.day.hanzi.length === 2, `longitude ${longitude}`);
+    }
+    // Omitted longitude keeps the old clock-time behavior.
+    const c = calculateBaZi({ date: '2024-01-01', time: '12:00' });
+    assert.equal(c.hour.hanzi, '庚午');
+  });
+});
+
 describe('leap-day continuity', () => {
   it('day pillars advance by exactly one across Feb 29', () => {
     const d28 = dayPillarIndex(2024, 2, 28);

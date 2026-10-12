@@ -30,7 +30,9 @@ export interface BirthInput {
   date: string;
   /** Local clock time, 'HH:mm' (24h). */
   time: string;
-  /** Birthplace longitude in degrees East. Enables true-solar-time correction. */
+  /** Birthplace longitude in degrees East. Enables true-solar-time correction.
+   * Must be within -180..180; anything else (or NaN) throws, since a bad
+   * longitude would silently corrupt the solar-time correction. */
   longitude?: number;
   /** Standard meridian of the clock timezone in degrees East.
    * Defaults to the utcOffsetMinutes meridian (offset/15), or 120 = Beijing
@@ -88,6 +90,20 @@ function parseTime(time: string): { hh: number; mm: number } {
     throw new Error(`Invalid time '${time}': hour must be 00-23 and minute 00-59.`);
   }
   return { hh, mm };
+}
+
+/**
+ * Birthplace longitude, validated like parseDate/parseTime validate theirs:
+ * NaN or anything outside -180..180 would silently corrupt the solar-time
+ * correction (or crash deep inside with a useless message), so reject it
+ * here with a clear error.
+ */
+function parseLongitude(longitude: number | undefined): number | undefined {
+  if (longitude === undefined) return undefined;
+  if (!Number.isFinite(longitude) || longitude < -180 || longitude > 180) {
+    throw new Error(`Invalid longitude '${longitude}': must be a number between -180 and 180.`);
+  }
+  return longitude;
 }
 
 /**
@@ -157,6 +173,7 @@ export function calculateBaZi(input: BirthInput): BaZiChart {
   const { y, m, d } = parseDate(input.date);
   const { hh, mm } = parseTime(input.time);
   const birth = birthInstantUtc(input);
+  const longitude = parseLongitude(input.longitude);
 
   // True solar time: 1° of longitude = 4 minutes vs. the standard meridian,
   // plus the equation of time (seasonal, up to ±16 minutes). Only applied
@@ -167,8 +184,8 @@ export function calculateBaZi(input: BirthInput): BaZiChart {
   const solarTotal =
     hh * 60 +
     mm +
-    (input.longitude !== undefined
-      ? (input.longitude - meridian) * 4 + equationOfTimeAt(birth)
+    (longitude !== undefined
+      ? (longitude - meridian) * 4 + equationOfTimeAt(birth)
       : 0);
   const solarMinutes = mod(Math.floor(solarTotal), 1440);
 
