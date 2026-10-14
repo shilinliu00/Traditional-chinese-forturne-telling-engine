@@ -2,6 +2,8 @@
 
 A full-stack BaZi (Four Pillars of Destiny, 四柱八字) chart calculator and interpreter — a portfolio project combining Chinese metaphysics with real computer science: calendar algorithms, astronomical solar terms, and a rule-based interpretation engine.
 
+**Live demo:** https://bazi-calculator-demo.vercel.app (no sign in needed)
+
 Enter a birth date, time, and birthplace → get the complete four-pillar chart (year 年柱, month 月柱, day 日柱, hour 时柱) with hidden stems, Ten Gods (十神), Five Element (五行) analysis, luck pillars (大运), and the current annual pillar (流年).
 
 ## Monorepo layout
