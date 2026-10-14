@@ -1,5 +1,5 @@
 /**
- * Structural rule evaluation (合/冲/害 analysis) over a computed chart.
+ * Structural rule evaluation (合/冲/害/半合 analysis) over a computed chart.
  *
  * Design note: chart *calculation* lives in pillars.ts; this module is the
  * *interpretation* layer. Each rule hit keeps its evidence (the pillars
@@ -102,6 +102,8 @@ function pillarWithBranch(chart: BaZiChart, key: PillarKey, branch: number): Pil
 /**
  * Evaluate the structural 合/冲 rules against a chart.
  * Returns one hit per matched pattern, in deterministic pillar order.
+ * A complete 三合局 suppresses its 半合 pairs; a 生/墓 pair without the
+ * 旺 branch (e.g. 申辰 with no 子) is an 拱, not a half combination.
  */
 export function evaluateRules(chart: BaZiChart): RuleHit[] {
   const hits: RuleHit[] = [];
@@ -150,6 +152,8 @@ export function evaluateRules(chart: BaZiChart): RuleHit[] {
   }
 
   // 地支三合局 / 三会方 — all three branches present.
+  // Complete triples are recorded so their 半合 pairs can be skipped below.
+  const completeTriples = new Set<string>();
   const triple = (
     rule: string,
     name: string,
@@ -158,6 +162,7 @@ export function evaluateRules(chart: BaZiChart): RuleHit[] {
     for (const t of list) {
       const pillars = t.branches.map((br) => PILLAR_ORDER.find((k) => chart[k].branch === br));
       if (pillars.every((p) => p !== undefined)) {
+        completeTriples.add(t.branches.join(','));
         const ps = (pillars as PillarKey[]).sort((x, y) => PILLAR_ORDER.indexOf(x) - PILLAR_ORDER.indexOf(y));
         hits.push({
           rule,
@@ -172,6 +177,39 @@ export function evaluateRules(chart: BaZiChart): RuleHit[] {
   };
   triple('triple-combination', '地支三合局', TRIPLE_COMBINATIONS);
   triple('triple-meeting', '地支三会方', TRIPLE_MEETINGS);
+
+  // 地支半合局 — two branches of a 三合局 that include the middle (旺)
+  // branch: 生旺半合 (e.g. 申子) or 旺墓半合 (e.g. 子辰). Documented in
+  // 《三命通会》. A complete triple above already covers its pairs, and a
+  // 生/墓 pair without the 旺 branch (an 拱, e.g. 申辰 with no 子) is not
+  // a half combination.
+  for (const t of TRIPLE_COMBINATIONS) {
+    if (completeTriples.has(t.branches.join(','))) continue;
+    const [sheng, wang, mu] = t.branches;
+    const halves: Array<[number, number, string]> = [
+      [sheng, wang, '生旺半合'],
+      [wang, mu, '旺墓半合'],
+    ];
+    for (const [a, b, kind] of halves) {
+      const pa = PILLAR_ORDER.find((k) => chart[k].branch === a);
+      const pb = PILLAR_ORDER.find((k) => chart[k].branch === b);
+      if (pa !== undefined && pb !== undefined) {
+        const ps = [pa, pb].sort((x, y) => PILLAR_ORDER.indexOf(x) - PILLAR_ORDER.indexOf(y));
+        hits.push({
+          rule: 'half-combination',
+          name: '地支半合局',
+          pattern: `${BRANCHES[a].hanzi}${BRANCHES[b].hanzi}半合${ELEMENT_HANZI[t.element]}局`,
+          pillars: ps,
+          factors: [
+            `${PILLAR_NAME[ps[0]]}支${BRANCHES[chart[ps[0]].branch].hanzi}`,
+            `${PILLAR_NAME[ps[1]]}支${BRANCHES[chart[ps[1]].branch].hanzi}`,
+            kind,
+          ],
+          source: SOURCE,
+        });
+      }
+    }
+  }
 
   // 地支六冲 — any clashing pair.
   for (const [a, b] of BRANCH_CLASHES) {
