@@ -9,7 +9,7 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { luckDirection, luckPillars, annualPillar } from '../src/luckPillars.ts';
-import { calculateBaZi } from '../src/pillars.ts';
+import { calculateBaZi, baziYearAt, yearPillarAt } from '../src/pillars.ts';
 
 describe('luck direction', () => {
   it('阳男/阴女 forward, 阴男/阳女 backward', () => {
@@ -73,5 +73,21 @@ describe('annual pillars', () => {
     assert.equal(annualPillar(2025).hanzi, '乙巳');
     assert.equal(annualPillar(2023).hanzi, '癸卯');
     assert.equal(annualPillar(2000).hanzi, '庚辰');
+  });
+
+  it('annualPillar(baziYearAt(t)) always matches the chart year pillar', () => {
+    // The web UI renders the flowing year as annualPillar(baziYearAt(now));
+    // it must agree with yearPillarAt at every instant, especially around
+    // the Lichun boundary where the BaZi year rolls over.
+    for (const y of [1999, 2000, 2023, 2024, 2025]) {
+      for (const d of [`${y}-01-15T00:00:00Z`, `${y}-02-03T12:00:00Z`, `${y}-02-05T00:00:00Z`, `${y}-06-01T00:00:00Z`]) {
+        const t = new Date(d);
+        assert.equal(
+          annualPillar(baziYearAt(t)).hanzi,
+          yearPillarAt(t).hanzi,
+          `mismatch at ${d}`,
+        );
+      }
+    }
   });
 });
