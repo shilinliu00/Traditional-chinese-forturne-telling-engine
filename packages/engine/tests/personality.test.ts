@@ -7,21 +7,20 @@ import { TEN_GOD_INFO, type TenGod } from '../src/tenGods.ts';
 import { readChart } from '../src/reading.ts';
 import { personalityTraits, countTenGods } from '../src/personality.ts';
 
-test('every ten god maps to keywords', () => {
+test('top traits carry the full keyword set from the mapping table', () => {
   const reading = readChart({ date: '2000-06-15', time: '12:00' });
+  const counts = countTenGods(reading);
   const traits = personalityTraits(reading, 'balanced');
-  const gods = (Object.keys(TEN_GOD_INFO) as TenGod[]).filter(
-    (g) => countTenGods(reading)[g] > 0,
-  );
-  for (const god of gods) {
-    const trait = traits.find((t) => t.god === god) ?? {
-      keywords: [],
-      keywordsZh: [],
-    };
-    // a god with keywords always exists in the table, even if it did not make the top 3
-    assert.ok(trait.keywords.length === 3 || trait.keywords.length === 0);
-  }
   assert.ok(traits.length > 0 && traits.length <= 3);
+  for (const t of traits) {
+    // every reported trait has exactly 3 English + 3 Chinese keywords and
+    // stays consistent with the TEN_GOD_INFO table and the god counts
+    assert.equal(t.keywords.length, 3, t.god);
+    assert.equal(t.keywordsZh.length, 3, t.god);
+    assert.equal(t.pinyin, TEN_GOD_INFO[t.god].pinyin);
+    assert.equal(t.english, TEN_GOD_INFO[t.god].english);
+    assert.equal(t.count, counts[t.god]);
+  }
 });
 
 test('traits are sorted by count descending', () => {
