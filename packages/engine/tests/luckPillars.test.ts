@@ -65,6 +65,28 @@ describe('luck pillars', () => {
   it('rejects invalid counts', () => {
     assert.throws(() => luckPillars(maleInput, 0), /positive integer/);
   });
+
+  it('start ages stay within the 3 days 1 year scale across the year', () => {
+    // The first start age is days-to-neighboring-Jie / 3; neighboring Jies
+    // are at most ~31.5 days apart, so it must land in [0, 10.6) for every
+    // birthday and direction. A window bug (e.g. picking a Jie a year off)
+    // would blow past this bound.
+    for (let t = Date.UTC(2024, 0, 1); t < Date.UTC(2025, 0, 1); t += 5 * 86_400_000) {
+      const d = new Date(t);
+      const date = `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, '0')}-${String(d.getUTCDate()).padStart(2, '0')}`;
+      for (const gender of ['male', 'female'] as const) {
+        const luck = luckPillars({ date, time: '12:00', utcOffsetMinutes: 0, gender });
+        const first = luck[0].startAge;
+        assert.ok(first >= 0 && first < 10.6, `${date} ${gender}: startAge=${first}`);
+        for (let i = 1; i < luck.length; i++) {
+          assert.ok(
+            Math.abs(luck[i].startAge - luck[i - 1].startAge - 10) < 1e-9,
+            `${date} ${gender}: pillars step by 10 years`,
+          );
+        }
+      }
+    }
+  });
 });
 
 describe('annual pillars', () => {
