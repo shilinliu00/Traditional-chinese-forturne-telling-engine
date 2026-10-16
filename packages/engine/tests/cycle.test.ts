@@ -41,5 +41,8 @@ describe('sexagenary cycle', () => {
     assert.throws(() => ganzhiIndex(0, 1), /Invalid pairing/); // 甲丑
     assert.throws(() => ganzhiIndex(1, 0), /Invalid pairing/); // 乙子
     assert.throws(() => ganzhiIndex(9, 10), /Invalid pairing/); // 癸戌
+    // The message names the rule that was actually violated.
+    assert.throws(() => ganzhiIndex(0, 1), /yang stems pair only with yang branches/);
+    assert.throws(() => ganzhiIndex(1, 0), /yin stems pair only with yin branches/);
   });
 });

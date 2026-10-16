@@ -22,8 +22,10 @@ export function branchOf(ganzhiIndex: number): number {
 /** Cycle position (0–59) for a stem/branch pair. Throws on invalid pairings. */
 export function ganzhiIndex(stem: number, branch: number): number {
   if (STEMS[stem].polarity !== BRANCHES[branch].polarity) {
+    const polarity = STEMS[stem].polarity;
     throw new Error(
-      `Invalid pairing ${STEMS[stem].hanzi}${BRANCHES[branch].hanzi}: yang stems pair only with yang branches.`,
+      `Invalid pairing ${STEMS[stem].hanzi}${BRANCHES[branch].hanzi}: ` +
+        `${polarity} stems pair only with ${polarity} branches.`,
     );
   }
   for (let i = 0; i < 60; i++) {
