@@ -155,4 +155,27 @@ describe('rule evaluation', () => {
     const hits = evaluateRules(chart([[0, 8], [2, 4], [4, 6], [6, 6]]));
     assert.deepEqual(hits, []);
   });
+
+  it('lists pair rule pillars in chart order, not table order', () => {
+    // 甲午 / 甲子 / 甲午 / 甲子 → 子午相冲: the 午 sits in the year pillar
+    // but the pair table lists 子 first; repeated 午/子 keep every other
+    // pair relation out, all 甲 stems form no 五合
+    const clash = evaluateRules(chart([[0, 6], [0, 0], [0, 6], [0, 0]]));
+    assert.equal(clash.length, 1);
+    assert.equal(clash[0].pattern, '子午相冲');
+    assert.deepEqual(clash[0].pillars, ['year', 'month']);
+    assert.deepEqual(clash[0].factors, ['年支午', '月支子']);
+    // 甲丑 / 甲子 / 甲丑 / 甲子 → 子丑合土, same ordering story
+    const combo = evaluateRules(chart([[0, 1], [0, 0], [0, 1], [0, 0]]));
+    assert.equal(combo.length, 1);
+    assert.equal(combo[0].pattern, '子丑合土');
+    assert.deepEqual(combo[0].pillars, ['year', 'month']);
+    assert.deepEqual(combo[0].factors, ['年支丑', '月支子', '合化土']);
+    // 甲午 / 甲丑 / 甲午 / 甲丑 → 丑午相害, same ordering story
+    const harm = evaluateRules(chart([[0, 6], [0, 1], [0, 6], [0, 1]]));
+    assert.equal(harm.length, 1);
+    assert.equal(harm[0].pattern, '丑午相害');
+    assert.deepEqual(harm[0].pillars, ['year', 'month']);
+    assert.deepEqual(harm[0].factors, ['年支午', '月支丑']);
+  });
 });

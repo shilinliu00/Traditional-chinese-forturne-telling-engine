@@ -15,6 +15,11 @@ export type PillarKey = 'year' | 'month' | 'day' | 'hour';
 const PILLAR_ORDER: PillarKey[] = ['year', 'month', 'day', 'hour'];
 const PILLAR_NAME: Record<PillarKey, string> = { year: '年', month: '月', day: '日', hour: '时' };
 
+/** Pillar keys in chart order (year → month → day → hour). */
+function inPillarOrder(ps: PillarKey[]): PillarKey[] {
+  return ps.sort((x, y) => PILLAR_ORDER.indexOf(x) - PILLAR_ORDER.indexOf(y));
+}
+
 export interface RuleHit {
   /** Stable rule id, e.g. 'stem-combination'. */
   rule: string;
@@ -136,14 +141,15 @@ export function evaluateRules(chart: BaZiChart): RuleHit[] {
     const pa = PILLAR_ORDER.find((k) => chart[k].branch === a);
     const pb = PILLAR_ORDER.find((k) => chart[k].branch === b);
     if (pa !== undefined && pb !== undefined) {
+      const ps = inPillarOrder([pa, pb]);
       hits.push({
         rule: 'branch-six-combination',
         name: '地支六合',
         pattern: `${BRANCHES[a].hanzi}${BRANCHES[b].hanzi}合${ELEMENT_HANZI[element]}`,
-        pillars: [pa, pb],
+        pillars: ps,
         factors: [
-          `${PILLAR_NAME[pa]}支${BRANCHES[a].hanzi}`,
-          `${PILLAR_NAME[pb]}支${BRANCHES[b].hanzi}`,
+          `${PILLAR_NAME[ps[0]]}支${BRANCHES[chart[ps[0]].branch].hanzi}`,
+          `${PILLAR_NAME[ps[1]]}支${BRANCHES[chart[ps[1]].branch].hanzi}`,
           `合化${ELEMENT_HANZI[element]}`,
         ],
         source: SOURCE,
@@ -216,12 +222,13 @@ export function evaluateRules(chart: BaZiChart): RuleHit[] {
     const pa = PILLAR_ORDER.find((k) => chart[k].branch === a);
     const pb = PILLAR_ORDER.find((k) => chart[k].branch === b);
     if (pa !== undefined && pb !== undefined) {
+      const ps = inPillarOrder([pa, pb]);
       hits.push({
         rule: 'branch-clash',
         name: '地支六冲',
         pattern: `${BRANCHES[a].hanzi}${BRANCHES[b].hanzi}相冲`,
-        pillars: [pa, pb],
-        factors: [`${PILLAR_NAME[pa]}支${BRANCHES[a].hanzi}`, `${PILLAR_NAME[pb]}支${BRANCHES[b].hanzi}`],
+        pillars: ps,
+        factors: [`${PILLAR_NAME[ps[0]]}支${BRANCHES[chart[ps[0]].branch].hanzi}`, `${PILLAR_NAME[ps[1]]}支${BRANCHES[chart[ps[1]].branch].hanzi}`],
         source: SOURCE,
       });
     }
@@ -232,12 +239,13 @@ export function evaluateRules(chart: BaZiChart): RuleHit[] {
     const pa = PILLAR_ORDER.find((k) => chart[k].branch === a);
     const pb = PILLAR_ORDER.find((k) => chart[k].branch === b);
     if (pa !== undefined && pb !== undefined) {
+      const ps = inPillarOrder([pa, pb]);
       hits.push({
         rule: 'branch-harm',
         name: '地支六害',
         pattern: `${BRANCHES[a].hanzi}${BRANCHES[b].hanzi}相害`,
-        pillars: [pa, pb],
-        factors: [`${PILLAR_NAME[pa]}支${BRANCHES[a].hanzi}`, `${PILLAR_NAME[pb]}支${BRANCHES[b].hanzi}`],
+        pillars: ps,
+        factors: [`${PILLAR_NAME[ps[0]]}支${BRANCHES[chart[ps[0]].branch].hanzi}`, `${PILLAR_NAME[ps[1]]}支${BRANCHES[chart[ps[1]].branch].hanzi}`],
         source: SOURCE,
       });
     }
