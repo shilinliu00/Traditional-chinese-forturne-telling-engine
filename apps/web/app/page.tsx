@@ -222,7 +222,9 @@ function StrengthCard({ strength, favorable, t }: {
   );
 }
 
-function PersonalityCard({ traits, t }: { traits: PersonalityTrait[]; t: Record<string, string> }) {
+function PersonalityCard({ traits, t, lang }: {
+  traits: PersonalityTrait[]; t: Record<string, string>; lang: Lang;
+}) {
   return (
     <div className="card">
       <h2>{t.personality}</h2>
@@ -232,7 +234,7 @@ function PersonalityCard({ traits, t }: { traits: PersonalityTrait[]; t: Record<
         <ul className="rule-list">
           {traits.map((tr) => (
             <li key={tr.god}>
-              <b>{tr.god} · {tr.english}</b> × {tr.count}
+              <b>{tr.god} · {lang === 'zh' ? tr.pinyin : tr.english}</b> × {tr.count}
               <span className="meta">
                 {' '}— {tr.keywords.join(' · ')} · {tr.keywordsZh.join('、')}
                 {' '}({tr.expression} {tr.expressionZh})
@@ -458,7 +460,7 @@ export default function Home() {
             <div className="element-bar">
               {godCounts.map(({ god, count }) => (
                 <span key={god} className="element-chip">
-                  {god} {TEN_GOD_INFO[god].english} × {count}
+                  {god} {lang === 'zh' ? TEN_GOD_INFO[god].pinyin : TEN_GOD_INFO[god].english} × {count}
                 </span>
               ))}
             </div>
@@ -469,7 +471,7 @@ export default function Home() {
 
           <StrengthCard strength={result.strength} favorable={result.favorable} t={t} />
 
-          <PersonalityCard traits={result.personality} t={t} />
+          <PersonalityCard traits={result.personality} t={t} lang={lang} />
 
           <div className="card">
             <h2>{t.balance}</h2>
