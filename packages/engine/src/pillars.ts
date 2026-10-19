@@ -63,7 +63,17 @@ export interface BaZiChart {
   dayMaster: number;
 }
 
+/**
+ * A four-pillar stem/branch pair. Rejects out-of-range indexes up front,
+ * instead of crashing on `STEMS[stem].hanzi` with a useless message.
+ */
 export function makePillar(stem: number, branch: number): Pillar {
+  if (!Number.isInteger(stem) || stem < 0 || stem > 9) {
+    throw new Error(`Invalid stem '${stem}': must be an integer from 0 to 9.`);
+  }
+  if (!Number.isInteger(branch) || branch < 0 || branch > 11) {
+    throw new Error(`Invalid branch '${branch}': must be an integer from 0 to 11.`);
+  }
   return { stem, branch, hanzi: STEMS[stem].hanzi + BRANCHES[branch].hanzi };
 }
 

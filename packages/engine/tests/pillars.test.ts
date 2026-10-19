@@ -4,7 +4,7 @@
  */
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { calculateBaZi, dayPillarIndex } from '../src/pillars.ts';
+import { calculateBaZi, dayPillarIndex, makePillar } from '../src/pillars.ts';
 import { ganzhiHanzi } from '../src/cycle.ts';
 import { tenGod } from '../src/tenGods.ts';
 
@@ -96,6 +96,17 @@ describe('input validation', () => {
   it('accepts Feb 29 on leap years', () => {
     const c = calculateBaZi({ date: '2024-02-29', time: '12:00' });
     assert.equal(c.day.hanzi, '癸亥');
+  });
+
+  it('rejects out-of-range pillar indexes with a clear error', () => {
+    // makePillar used to crash on `STEMS[stem].hanzi` with
+    // "Cannot read properties of undefined (reading 'hanzi')".
+    for (const [stem, branch] of [[10, 0], [-1, 0], [1.5, 0]] as const) {
+      assert.throws(() => makePillar(stem, branch), /Invalid stem/);
+    }
+    for (const [stem, branch] of [[0, 12], [0, -1], [0, 2.5]] as const) {
+      assert.throws(() => makePillar(stem, branch), /Invalid branch/);
+    }
   });
 });
 
