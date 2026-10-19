@@ -79,6 +79,20 @@ describe('dayMasterStrength', () => {
     assert.match(r.criteria[0].factors[0], /生扶日主/);
   });
 
+  it('score of exactly 3.5 is still weak (cutoff is inclusive)', () => {
+    // 甲 DM: 得令 1 (month 亥 main qi 壬 Water generates Wood) +
+    // 得地 2 (亥 hides 甲, 卯 hides 乙; 子 and 午 hide no Wood) +
+    // 得势 0.5 (only 月干癸 generates Wood) = 3.5, the weakest 'weak' score.
+    const c = chart(
+      [[2, 0], [9, 11], [0, 3], [2, 6]],
+      0,
+    );
+    const r = dayMasterStrength(c);
+    assert.equal(r.score, 3.5);
+    assert.equal(r.verdict, 'weak');
+    assert.equal(r.verdictHanzi, '身弱');
+  });
+
   it('keeps evidence factors for every criterion', () => {
     const c = chart(
       [[1, 0], [2, 2], [0, 3], [8, 6]],
