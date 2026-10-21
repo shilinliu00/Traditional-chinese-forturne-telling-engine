@@ -140,6 +140,11 @@ const STR: Record<Lang, Record<string, string>> = {
 
 const PILLAR_KEYS = ['year', 'month', 'day', 'hour'] as const;
 
+/** STR dictionary key for a pillar label: 'year' -> t.pillarYear. */
+function pillarLabel(t: Record<string, string>, key: string): string {
+  return t[`pillar${key[0].toUpperCase()}${key.slice(1)}`];
+}
+
 /** Render a decimal UTC offset as UTC+5:45; whole hours stay UTC+8. */
 function formatUtcOffset(o: string): string {
   const sign = o.startsWith('-') ? '-' : '+';
@@ -148,10 +153,6 @@ function formatUtcOffset(o: string): string {
   const minutes = Math.round((abs - hours) * 60);
   return minutes === 0 ? `UTC${sign}${hours}` : `UTC${sign}${hours}:${String(minutes).padStart(2, '0')}`;
 }
-
-const PILLAR_ZH: Record<string, string> = {
-  year: '年柱', month: '月柱', day: '日柱', hour: '时柱',
-};
 
 function StructureCard({ hits, t }: { hits: RuleHit[]; t: Record<string, string> }) {
   return (
@@ -165,7 +166,7 @@ function StructureCard({ hits, t }: { hits: RuleHit[]; t: Record<string, string>
             <li key={i}>
               <b>{hit.name}</b> · {hit.pattern}
               <span className="meta">
-                {' '}({hit.pillars.map((p) => PILLAR_ZH[p]).join('、')} · {hit.factors.join('，')})
+                {' '}({hit.pillars.map((p) => pillarLabel(t, p)).join('、')} · {hit.factors.join('，')})
               </span>
               <span className="meta"> — {hit.source}</span>
             </li>
@@ -448,7 +449,7 @@ export default function Home() {
                 <PillarCard
                   key={key}
                   reading={result.reading[key]}
-                  label={t[`${key}Pillar`]}
+                  label={pillarLabel(t, key)}
                   highlight={key === 'day'}
                 />
               ))}
