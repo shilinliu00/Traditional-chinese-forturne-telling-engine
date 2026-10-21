@@ -1,5 +1,5 @@
 /**
- * Structural rule evaluation (合/冲/害/半合 analysis) over a computed chart.
+ * Structural rule evaluation (合/冲/刑/害/半合 analysis) over a computed chart.
  *
  * Design note: chart *calculation* lives in pillars.ts; this module is the
  * *interpretation* layer. Each rule hit keeps its evidence (the pillars
@@ -101,6 +101,21 @@ const BRANCH_HARMS: Array<[number, number]> = [
   [8, 11],  // 申亥害
   [9, 10],  // 酉戌害
 ];
+
+/** 地支三刑: triple punishments [branches in classical order, kind]. Documented in 《三命通会》. */
+const TRIPLE_PUNISHMENTS: Array<{ branches: [number, number, number]; kind: string }> = [
+  { branches: [2, 5, 8], kind: '恃势之刑' }, // 寅巳申三刑
+  { branches: [1, 10, 7], kind: '无恩之刑' }, // 丑戌未三刑
+];
+
+/** 地支相刑 pair: 子卯 (无礼之刑). Documented in 《三命通会》. */
+const PAIR_PUNISHMENT: { branches: [number, number]; kind: string } = {
+  branches: [0, 3],
+  kind: '无礼之刑',
+};
+
+/** 地支自刑: branches that punish themselves when repeated in a chart. Documented in 《三命通会》. */
+const SELF_PUNISHMENTS: number[] = [4, 6, 9, 11]; // 辰午酉亥
 
 const SOURCE = '《三命通会》';
 
@@ -270,6 +285,62 @@ export function evaluateRules(chart: BaZiChart): RuleHit[] {
         pattern: `${BRANCHES[a].hanzi}${BRANCHES[b].hanzi}相害`,
         pillars: ps,
         factors: [`${PILLAR_NAME[ps[0]]}支${BRANCHES[chart[ps[0]].branch].hanzi}`, `${PILLAR_NAME[ps[1]]}支${BRANCHES[chart[ps[1]].branch].hanzi}`],
+        source: SOURCE,
+      });
+    }
+  }
+
+  // 地支三刑 — all three branches present.
+  for (const t of TRIPLE_PUNISHMENTS) {
+    const pillars = t.branches.map((br) => PILLAR_ORDER.find((k) => chart[k].branch === br));
+    if (pillars.every((p) => p !== undefined)) {
+      const ps = (pillars as PillarKey[]).sort((x, y) => PILLAR_ORDER.indexOf(x) - PILLAR_ORDER.indexOf(y));
+      hits.push({
+        rule: 'branch-punishment',
+        name: '地支三刑',
+        pattern: `${t.branches.map((br) => BRANCHES[br].hanzi).join('')}三刑`,
+        pillars: ps,
+        factors: [
+          ...ps.map((k) => `${PILLAR_NAME[k]}支${BRANCHES[chart[k].branch].hanzi}`),
+          t.kind,
+        ],
+        source: SOURCE,
+      });
+    }
+  }
+
+  // 子卯相刑.
+  {
+    const [a, b] = PAIR_PUNISHMENT.branches;
+    const pa = PILLAR_ORDER.find((k) => chart[k].branch === a);
+    const pb = PILLAR_ORDER.find((k) => chart[k].branch === b);
+    if (pa !== undefined && pb !== undefined) {
+      const ps = inPillarOrder([pa, pb]);
+      hits.push({
+        rule: 'branch-punishment',
+        name: '地支三刑',
+        pattern: `${BRANCHES[a].hanzi}${BRANCHES[b].hanzi}相刑`,
+        pillars: ps,
+        factors: [
+          `${PILLAR_NAME[ps[0]]}支${BRANCHES[chart[ps[0]].branch].hanzi}`,
+          `${PILLAR_NAME[ps[1]]}支${BRANCHES[chart[ps[1]].branch].hanzi}`,
+          PAIR_PUNISHMENT.kind,
+        ],
+        source: SOURCE,
+      });
+    }
+  }
+
+  // 地支自刑 — 辰/午/酉/亥 appearing in two or more pillars.
+  for (const br of SELF_PUNISHMENTS) {
+    const ps = PILLAR_ORDER.filter((k) => chart[k].branch === br);
+    if (ps.length >= 2) {
+      hits.push({
+        rule: 'branch-punishment',
+        name: '地支三刑',
+        pattern: `${BRANCHES[br].hanzi}自刑`,
+        pillars: ps,
+        factors: ps.map((k) => `${PILLAR_NAME[k]}支${BRANCHES[br].hanzi}`),
         source: SOURCE,
       });
     }

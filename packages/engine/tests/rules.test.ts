@@ -28,6 +28,62 @@ describe('rule evaluation', () => {
     assert.equal(h.source, '《三命通会》');
   });
 
+  it('detects 寅巳申三刑', () => {
+    // 甲寅 / 乙巳 / 丙申 / 丁寅 → 寅巳申三刑. 寅申相冲 and 寅巳相害 also
+    // fire on this chart, so the 三刑 hit is found among the hits.
+    const hits = evaluateRules(chart([[0, 2], [1, 5], [2, 8], [3, 2]]));
+    const h = hits.find((x) => x.rule === 'branch-punishment');
+    assert.ok(h, `expected a 三刑 hit, got ${JSON.stringify(hits.map((x) => x.pattern))}`);
+    assert.equal(h.pattern, '寅巳申三刑');
+    assert.deepEqual(h.pillars, ['year', 'month', 'day']);
+    assert.deepEqual(h.factors, ['年支寅', '月支巳', '日支申', '恃势之刑']);
+    assert.equal(h.source, '《三命通会》');
+  });
+
+  it('detects 丑戌未三刑', () => {
+    // 甲丑 / 乙戌 / 丙未 / 丁丑 → 丑戌未三刑 (丑未相冲 also fires, so the
+    // 三刑 hit is found among the hits)
+    const hits = evaluateRules(chart([[0, 1], [1, 10], [2, 7], [3, 1]]));
+    const h = hits.find((x) => x.rule === 'branch-punishment');
+    assert.ok(h, `expected a 三刑 hit, got ${JSON.stringify(hits.map((x) => x.pattern))}`);
+    assert.equal(h.pattern, '丑戌未三刑');
+    assert.deepEqual(h.pillars, ['year', 'month', 'day']);
+    assert.deepEqual(h.factors, ['年支丑', '月支戌', '日支未', '无恩之刑']);
+    assert.equal(h.source, '《三命通会》');
+  });
+
+  it('detects 子卯相刑', () => {
+    // 甲子 / 乙卯 / 丙寅 / 丁寅 → 子卯相刑, isolated (寅 branches dodge
+    // every other pair relation; stems form no 五合 or 相冲)
+    const hits = evaluateRules(chart([[0, 0], [1, 3], [2, 2], [3, 2]]));
+    assert.equal(hits.length, 1);
+    const [h] = hits;
+    assert.equal(h.rule, 'branch-punishment');
+    assert.equal(h.pattern, '子卯相刑');
+    assert.deepEqual(h.pillars, ['year', 'month']);
+    assert.deepEqual(h.factors, ['年支子', '月支卯', '无礼之刑']);
+    assert.equal(h.source, '《三命通会》');
+  });
+
+  it('detects 自刑 when a self-punishing branch repeats', () => {
+    // 甲辰 / 乙辰 / 丙寅 / 丁寅 → 辰自刑 (寅 branches dodge every other
+    // pair relation; stems form no 五合 or 相冲)
+    const hits = evaluateRules(chart([[0, 4], [1, 4], [2, 2], [3, 2]]));
+    assert.equal(hits.length, 1);
+    const [h] = hits;
+    assert.equal(h.rule, 'branch-punishment');
+    assert.equal(h.pattern, '辰自刑');
+    assert.deepEqual(h.pillars, ['year', 'month']);
+    assert.deepEqual(h.factors, ['年支辰', '月支辰']);
+    assert.equal(h.source, '《三命通会》');
+  });
+
+  it('a single 辰 with no repeat is not 自刑', () => {
+    // 甲辰 / 乙寅 / 丙寅 / 丁寅 → no hits
+    const hits = evaluateRules(chart([[0, 4], [1, 2], [2, 2], [3, 2]]));
+    assert.deepEqual(hits, []);
+  });
+
   it('detects 天干相冲', () => {
     // 甲寅 / 庚寅 / 丙寅 / 丁寅 → 甲庚相冲 (all-寅 branches dodge every
     // branch pair relation; stems form no 五合)
@@ -82,9 +138,9 @@ describe('rule evaluation', () => {
   });
 
   it('detects 地支六冲', () => {
-    // 甲子 / 乙午 / 丙卯 / 丁巳 → 子午相冲 (the other branches dodge every
-    // pair relation, including 半合; stems form no 五合 or 相冲)
-    const hits = evaluateRules(chart([[0, 0], [1, 6], [2, 3], [3, 5]]));
+    // 甲子 / 乙午 / 丙酉 / 丁亥 → 子午相冲 (酉/亥 dodge every other pair
+    // relation; stems form no 五合 or 相冲)
+    const hits = evaluateRules(chart([[0, 0], [1, 6], [2, 9], [3, 11]]));
     assert.equal(hits.length, 1);
     const [h] = hits;
     assert.equal(h.rule, 'branch-clash');
@@ -138,9 +194,9 @@ describe('rule evaluation', () => {
   });
 
   it('detects 生旺半合', () => {
-    // 甲申 / 丙子 / 戊卯 / 丁卯 → 申子半合水局 (no 辰, so no full triple;
-    // 卯 branches dodge every other pair relation)
-    const hits = evaluateRules(chart([[0, 8], [2, 0], [4, 3], [3, 3]]));
+    // 甲申 / 丙子 / 戊戌 / 丁戌 → 申子半合水局 (no 辰, so no full triple;
+    // 戌 branches dodge every other pair relation)
+    const hits = evaluateRules(chart([[0, 8], [2, 0], [4, 10], [3, 10]]));
     assert.equal(hits.length, 1);
     const [h] = hits;
     assert.equal(h.rule, 'half-combination');
@@ -181,22 +237,22 @@ describe('rule evaluation', () => {
   });
 
   it('lists pair rule pillars in chart order, not table order', () => {
-    // 甲午 / 甲子 / 甲午 / 甲子 → 子午相冲: the 午 sits in the year pillar
-    // but the pair table lists 子 first; repeated 午/子 keep every other
-    // pair relation out, all 甲 stems form no 五合
-    const clash = evaluateRules(chart([[0, 6], [0, 0], [0, 6], [0, 0]]));
+    // 甲午 / 甲子 / 甲酉 / 甲亥 → 子午相冲: the 午 sits in the year pillar
+    // but the pair table lists 子 first (酉/亥 fillers dodge every other
+    // pair relation; all 甲 stems form no 五合 or 相冲)
+    const clash = evaluateRules(chart([[0, 6], [0, 0], [0, 9], [0, 11]]));
     assert.equal(clash.length, 1);
     assert.equal(clash[0].pattern, '子午相冲');
     assert.deepEqual(clash[0].pillars, ['year', 'month']);
     assert.deepEqual(clash[0].factors, ['年支午', '月支子']);
-    // 甲丑 / 甲子 / 甲丑 / 甲子 → 子丑合土, same ordering story
-    const combo = evaluateRules(chart([[0, 1], [0, 0], [0, 1], [0, 0]]));
+    // 甲丑 / 甲子 / 甲寅 / 甲寅 → 子丑合土, same ordering story
+    const combo = evaluateRules(chart([[0, 1], [0, 0], [0, 2], [0, 2]]));
     assert.equal(combo.length, 1);
     assert.equal(combo[0].pattern, '子丑合土');
     assert.deepEqual(combo[0].pillars, ['year', 'month']);
     assert.deepEqual(combo[0].factors, ['年支丑', '月支子', '合化土']);
-    // 甲午 / 甲丑 / 甲午 / 甲丑 → 丑午相害, same ordering story
-    const harm = evaluateRules(chart([[0, 6], [0, 1], [0, 6], [0, 1]]));
+    // 甲午 / 甲丑 / 甲申 / 甲卯 → 丑午相害, same ordering story
+    const harm = evaluateRules(chart([[0, 6], [0, 1], [0, 8], [0, 3]]));
     assert.equal(harm.length, 1);
     assert.equal(harm[0].pattern, '丑午相害');
     assert.deepEqual(harm[0].pillars, ['year', 'month']);
