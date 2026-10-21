@@ -48,6 +48,14 @@ const STEM_COMBINATIONS: Array<[number, number, Element]> = [
   [4, 9, 'Fire'],  // 戊癸合火
 ];
 
+/** 天干相冲: clashing stem pairs. Documented in 《三命通会》. */
+const STEM_CLASHES: Array<[number, number]> = [
+  [0, 6], // 甲庚冲
+  [1, 7], // 乙辛冲
+  [2, 8], // 丙壬冲
+  [3, 9], // 丁癸冲
+];
+
 /** 地支六合: [branchA, branchB, resulting element]. Documented in 《三命通会》. */
 const BRANCH_SIX_COMBINATIONS: Array<[number, number, Element]> = [
   [0, 1, 'Earth'],  // 子丑合土
@@ -100,10 +108,6 @@ function pillarWithStem(chart: BaZiChart, key: PillarKey, stem: number): PillarK
   return chart[key].stem === stem ? key : undefined;
 }
 
-function pillarWithBranch(chart: BaZiChart, key: PillarKey, branch: number): PillarKey | undefined {
-  return chart[key].branch === branch ? key : undefined;
-}
-
 /**
  * Evaluate the structural 合/冲 rules against a chart.
  * Returns one hit per matched pattern, in deterministic pillar order.
@@ -130,6 +134,26 @@ export function evaluateRules(chart: BaZiChart): RuleHit[] {
           `${PILLAR_NAME[pa]}干${STEMS[a].hanzi}`,
           `${PILLAR_NAME[pb]}干${STEMS[b].hanzi}`,
           `合化${ELEMENT_HANZI[element]}`,
+        ],
+        source: SOURCE,
+      });
+    }
+  }
+
+  // 天干相冲 — any two clashing heavenly stems.
+  for (const [a, b] of STEM_CLASHES) {
+    const pa = PILLAR_ORDER.find((k) => chart[k].stem === a);
+    const pb = PILLAR_ORDER.find((k) => chart[k].stem === b);
+    if (pa !== undefined && pb !== undefined) {
+      const ps = inPillarOrder([pa, pb]);
+      hits.push({
+        rule: 'stem-clash',
+        name: '天干相冲',
+        pattern: `${STEMS[a].hanzi}${STEMS[b].hanzi}相冲`,
+        pillars: ps,
+        factors: [
+          `${PILLAR_NAME[ps[0]]}干${STEMS[chart[ps[0]].stem].hanzi}`,
+          `${PILLAR_NAME[ps[1]]}干${STEMS[chart[ps[1]].stem].hanzi}`,
         ],
         source: SOURCE,
       });

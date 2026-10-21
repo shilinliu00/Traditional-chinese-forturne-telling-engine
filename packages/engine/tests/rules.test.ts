@@ -28,6 +28,30 @@ describe('rule evaluation', () => {
     assert.equal(h.source, '《三命通会》');
   });
 
+  it('detects 天干相冲', () => {
+    // 甲寅 / 庚寅 / 丙寅 / 丁寅 → 甲庚相冲 (all-寅 branches dodge every
+    // branch pair relation; stems form no 五合)
+    const hits = evaluateRules(chart([[0, 2], [6, 2], [2, 2], [3, 2]]));
+    assert.equal(hits.length, 1);
+    const [h] = hits;
+    assert.equal(h.rule, 'stem-clash');
+    assert.equal(h.name, '天干相冲');
+    assert.equal(h.pattern, '甲庚相冲');
+    assert.deepEqual(h.pillars, ['year', 'month']);
+    assert.deepEqual(h.factors, ['年干甲', '月干庚']);
+    assert.equal(h.source, '《三命通会》');
+  });
+
+  it('detects two stem clashes in one chart', () => {
+    // 甲寅 / 庚寅 / 丙寅 / 壬寅 → 甲庚相冲 + 丙壬相冲 (stems form no 五合)
+    const hits = evaluateRules(chart([[0, 2], [6, 2], [2, 2], [8, 2]]));
+    assert.equal(hits.length, 2);
+    assert.equal(hits[0].pattern, '甲庚相冲');
+    assert.deepEqual(hits[0].pillars, ['year', 'month']);
+    assert.equal(hits[1].pattern, '丙壬相冲');
+    assert.deepEqual(hits[1].pillars, ['day', 'hour']);
+  });
+
   it('detects 地支三合局', () => {
     // 甲申 / 丙子 / 戊辰 / 乙子 → 申子辰合水局 (the repeated 子 keeps the
     // branch pairs clean of 合/冲/害)
@@ -58,9 +82,9 @@ describe('rule evaluation', () => {
   });
 
   it('detects 地支六冲', () => {
-    // 甲子 / 丙午 / 戊卯 / 庚巳 → 子午相冲 (the other branches dodge every
-    // pair relation, including 半合; stems form no 五合)
-    const hits = evaluateRules(chart([[0, 0], [2, 6], [4, 3], [6, 5]]));
+    // 甲子 / 乙午 / 丙卯 / 丁巳 → 子午相冲 (the other branches dodge every
+    // pair relation, including 半合; stems form no 五合 or 相冲)
+    const hits = evaluateRules(chart([[0, 0], [1, 6], [2, 3], [3, 5]]));
     assert.equal(hits.length, 1);
     const [h] = hits;
     assert.equal(h.rule, 'branch-clash');
@@ -78,9 +102,9 @@ describe('rule evaluation', () => {
   });
 
   it('detects 地支六害', () => {
-    // 甲子 / 丙未 / 戊子 / 庚未 → 子未相害 (repeated 子/未 keep every
-    // other pair relation out; stems 甲丙戊庚 form no 五合)
-    const hits = evaluateRules(chart([[0, 0], [2, 7], [4, 0], [6, 7]]));
+    // 甲子 / 乙未 / 丙子 / 丁未 → 子未相害 (repeated 子/未 keep every
+    // other pair relation out; stems 甲乙丙丁 form no 五合 or 相冲)
+    const hits = evaluateRules(chart([[0, 0], [1, 7], [2, 0], [3, 7]]));
     assert.equal(hits.length, 1);
     const [h] = hits;
     assert.equal(h.rule, 'branch-harm');
@@ -92,9 +116,9 @@ describe('rule evaluation', () => {
   });
 
   it('returns no hits for a pattern-free chart', () => {
-    // 甲巳 / 丙巳 / 戊午 / 庚午 — repeated 巳/午 branches dodge every pair
-    // relation (no 半合/合/冲/害 possible), stems form no 五合
-    const hits = evaluateRules(chart([[0, 5], [2, 5], [4, 6], [6, 6]]));
+    // 甲巳 / 乙巳 / 丙巳 / 丁巳 — repeated 巳 branches dodge every pair
+    // relation (no 半合/合/冲/害/刑 possible), stems form no 五合 or 相冲
+    const hits = evaluateRules(chart([[0, 5], [1, 5], [2, 5], [3, 5]]));
     assert.deepEqual(hits, []);
   });
 
@@ -114,9 +138,9 @@ describe('rule evaluation', () => {
   });
 
   it('detects 生旺半合', () => {
-    // 甲申 / 丙子 / 戊卯 / 庚卯 → 申子半合水局 (no 辰, so no full triple;
+    // 甲申 / 丙子 / 戊卯 / 丁卯 → 申子半合水局 (no 辰, so no full triple;
     // 卯 branches dodge every other pair relation)
-    const hits = evaluateRules(chart([[0, 8], [2, 0], [4, 3], [6, 3]]));
+    const hits = evaluateRules(chart([[0, 8], [2, 0], [4, 3], [3, 3]]));
     assert.equal(hits.length, 1);
     const [h] = hits;
     assert.equal(h.rule, 'half-combination');
@@ -128,9 +152,9 @@ describe('rule evaluation', () => {
   });
 
   it('detects 旺墓半合', () => {
-    // 甲子 / 丙辰 / 戊寅 / 庚寅 → 子辰半合水局 (no 申, so no full triple;
+    // 甲子 / 丙辰 / 戊寅 / 丁寅 → 子辰半合水局 (no 申, so no full triple;
     // 寅 branches dodge every other pair relation)
-    const hits = evaluateRules(chart([[0, 0], [2, 4], [4, 2], [6, 2]]));
+    const hits = evaluateRules(chart([[0, 0], [2, 4], [4, 2], [3, 2]]));
     assert.equal(hits.length, 1);
     const [h] = hits;
     assert.equal(h.rule, 'half-combination');
@@ -150,9 +174,9 @@ describe('rule evaluation', () => {
   });
 
   it('a 生/墓 pair without the 旺 branch is not a half combination', () => {
-    // 甲申 / 丙辰 / 戊午 / 庚午 → 申辰 with no 子 is an 拱, not 半合;
-    // 午 branches dodge every other pair relation
-    const hits = evaluateRules(chart([[0, 8], [2, 4], [4, 6], [6, 6]]));
+    // 甲申 / 丙辰 / 戊未 / 丁未 → 申辰 with no 子 is an 拱, not 半合;
+    // 未 branches dodge every other pair relation
+    const hits = evaluateRules(chart([[0, 8], [2, 4], [4, 7], [3, 7]]));
     assert.deepEqual(hits, []);
   });
 
