@@ -1,5 +1,5 @@
 /**
- * Structural rule evaluation (合/冲/刑/害/半合 analysis) over a computed chart.
+ * Structural rule evaluation (合/冲/刑/害/破/半合 analysis) over a computed chart.
  *
  * Design note: chart *calculation* lives in pillars.ts; this module is the
  * *interpretation* layer. Each rule hit keeps its evidence (the pillars
@@ -100,6 +100,16 @@ const BRANCH_HARMS: Array<[number, number]> = [
   [3, 4],   // 卯辰害
   [8, 11],  // 申亥害
   [9, 10],  // 酉戌害
+];
+
+/** 地支六破: breaking branch pairs. Documented in 《三命通会》. */
+const BRANCH_BREAKS: Array<[number, number]> = [
+  [0, 9],   // 子酉破
+  [1, 4],   // 丑辰破
+  [2, 11],  // 寅亥破
+  [3, 6],   // 卯午破
+  [5, 8],   // 巳申破
+  [7, 10],  // 未戌破
 ];
 
 /** 地支三刑: triple punishments [branches in classical order, kind]. Documented in 《三命通会》. */
@@ -283,6 +293,23 @@ export function evaluateRules(chart: BaZiChart): RuleHit[] {
         rule: 'branch-harm',
         name: '地支六害',
         pattern: `${BRANCHES[a].hanzi}${BRANCHES[b].hanzi}相害`,
+        pillars: ps,
+        factors: [`${PILLAR_NAME[ps[0]]}支${BRANCHES[chart[ps[0]].branch].hanzi}`, `${PILLAR_NAME[ps[1]]}支${BRANCHES[chart[ps[1]].branch].hanzi}`],
+        source: SOURCE,
+      });
+    }
+  }
+
+  // 地支六破 — any breaking pair.
+  for (const [a, b] of BRANCH_BREAKS) {
+    const pa = PILLAR_ORDER.find((k) => chart[k].branch === a);
+    const pb = PILLAR_ORDER.find((k) => chart[k].branch === b);
+    if (pa !== undefined && pb !== undefined) {
+      const ps = inPillarOrder([pa, pb]);
+      hits.push({
+        rule: 'branch-break',
+        name: '地支六破',
+        pattern: `${BRANCHES[a].hanzi}${BRANCHES[b].hanzi}相破`,
         pillars: ps,
         factors: [`${PILLAR_NAME[ps[0]]}支${BRANCHES[chart[ps[0]].branch].hanzi}`, `${PILLAR_NAME[ps[1]]}支${BRANCHES[chart[ps[1]].branch].hanzi}`],
         source: SOURCE,
