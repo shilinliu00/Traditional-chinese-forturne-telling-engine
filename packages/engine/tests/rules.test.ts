@@ -124,6 +124,17 @@ describe('rule evaluation', () => {
     assert.equal(h.source, '《三命通会》');
   });
 
+  it('reports one hit per pair when a branch repeats', () => {
+    // 甲寅 / 乙亥 / 丙酉 / 丁寅 → 寅亥合木 and 寅亥相破 fire once each
+    // even though 寅 appears twice; stems 甲乙丙丁 form no 五合 or 相冲
+    const hits = evaluateRules(chart([[0, 2], [1, 11], [2, 9], [3, 2]]));
+    assert.equal(hits.length, 2);
+    const brk = hits.find((x) => x.rule === 'branch-break');
+    assert.ok(brk);
+    assert.equal(brk.pattern, '寅亥相破');
+    assert.deepEqual(brk.pillars, ['year', 'month']);
+  });
+
   it('detects 天干相冲', () => {
     // 甲寅 / 庚寅 / 丙寅 / 丁寅 → 甲庚相冲 (all-寅 branches dodge every
     // branch pair relation; stems form no 五合)
