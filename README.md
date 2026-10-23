@@ -113,7 +113,7 @@ current form inputs.
 - **Hidden stems (藏干)**: each branch's hidden stems resolved to Ten Gods vs. the Day Master, main qi first.
 - **Day Master strength (旺衰)** and **favorable elements (喜用神/忌神)**: `dayMasterStrength()` scores the classical 得令/得地/得势 criteria with evidence factors; `favorableElements()` derives a first-order 扶抑 recommendation (身弱喜印比、身旺喜食伤官杀财) plus the birth season's 调候 need (cold months → Fire, hot months → Water). Both are shown in the web UI.
 - **Personality mapping (性格)**: `personalityTraits()` tallies the most frequent Ten Gods across the four pillar stems and every hidden stem, with keyword temperaments from the `TEN_GOD_INFO` table; the Day Master strength verdict modulates expression (身旺 → 外放, 身弱 → 内敛, 中和 → 平和). Shown in the web UI.
-- **Structural rules (合/冲/刑/害)**: `evaluateRules()` detects 天干五合, 天干相冲, 地支六合, 三合局, 三会方, 半合局 (the 生旺/旺墓 branch pairs of a 三合局, e.g. 申子/子辰半合水局 — a complete triple suppresses its pairs, and a 生/墓 pair without the 旺 branch is not counted), 六冲, 六害, and 三刑 (寅巳申/丑戌未 triple punishments, 子卯相刑, 辰午酉亥自刑) across the four pillars; every hit records its evidence (triggering pillars, human-readable factors) and the classical source (《三命通会》), keeping interpretation separate from calculation.
+- **Structural rules (合/冲/刑/害/破)**: `evaluateRules()` detects 天干五合, 天干相冲, 地支六合, 三合局, 三会方, 半合局 (the 生旺/旺墓 branch pairs of a 三合局, e.g. 申子/子辰半合水局 — a complete triple suppresses its pairs, and a 生/墓 pair without the 旺 branch is not counted), 六冲, 六害, 六破 (子酉破 etc.), and 三刑 (寅巳申/丑戌未 triple punishments, 子卯相刑, 辰午酉亥自刑) across the four pillars; every hit records its evidence (triggering pillars, human-readable factors) and the classical source (《三命通会》), keeping interpretation separate from calculation.
 - **Luck pillars (大运)**: direction from year-stem polarity × gender (阳男/阴女顺行, 阴男/阳女逆行); start age from birth-to-neighboring-Jie days ÷ 3 (三天折合一岁), fractional. Shown in the web UI alongside each pillar's Ten God and NaYin.
 - **Annual pillar (流年)**: the flowing year's ganzhi (the BaZi year begins at Lichun).
 
@@ -128,7 +128,7 @@ current form inputs.
 - [x] Astronomical solar-term calculation
 - [x] True solar time: longitude correction + equation of time
 - [x] NaYin (纳音) + hidden-stem Ten Gods in chart readings
-- [x] Structural rule evaluation (合/冲/害) with evidence factors + classical citations
+- [x] Structural rule evaluation (合/冲/刑/害/破) with evidence factors + classical citations
 - [x] Luck pillars (大运), annual pillars (流年)
 - [x] Interpretation engine: Day Master strength (得令/得地/得势 scoring in `packages/engine/src/strength.ts`), favorable elements (喜用神/忌神 + 调候 in `packages/engine/src/favorable.ts`), personality mapping (top Ten God temperaments in `packages/engine/src/personality.ts`) — all shown in the web UI
 - [x] Next.js web app: chart UI, element-balance visualizations (English UI with hanzi/pinyin labels)
