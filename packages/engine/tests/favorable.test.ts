@@ -104,6 +104,27 @@ describe('favorableElements', () => {
     assert.equal(r.seasonal.element, null);
   });
 
+  it('hai month (亥) needs Fire through its water main qi, not a special case', () => {
+    // 亥's main qi is Water (壬), so the main qi check alone catches it —
+    // unlike 丑, which needs the winter branch special case above.
+    const coldHai = chart(
+      [[1, 0], [2, 11], [0, 3], [8, 3]],
+      0,
+    );
+    const r = favorableElements(coldHai);
+    assert.equal(r.seasonal.element, 'Fire');
+    assert.ok(r.seasonal.reason.includes('亥'));
+  });
+
+  it('shen month (申) has no seasonal need', () => {
+    // Metal main qi, autumn month: neither the cold nor the hot rule fires.
+    const mildShen = chart(
+      [[1, 0], [2, 8], [0, 3], [8, 3]],
+      0,
+    );
+    assert.equal(favorableElements(mildShen).seasonal.element, null);
+  });
+
   it('wei month (未) counts as hot season despite its earth main qi', () => {
     // 未 is the last month of summer (三夏 巳午未); main qi is Earth (己),
     // so the Fire main-qi check alone would miss it.
