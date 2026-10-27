@@ -5,7 +5,7 @@
  */
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { calculateBaZi, dayPillarIndex, baziYearAt } from '../src/pillars.ts';
+import { calculateBaZi, dayPillarIndex, baziYearAt, hourPillar } from '../src/pillars.ts';
 import { lichunInstant, solarTermInstant, jieBranchAt } from '../src/solarTerms.ts';
 
 describe('term boundaries', () => {
@@ -120,6 +120,20 @@ describe('late zi hour (晚子时)', () => {
     const at = calculateBaZi({ date: '2024-01-01', time: '23:00' });
     assert.equal(at.day.hanzi, '乙丑'); // late 子时 belongs to the next day
     assert.equal(at.hour.hanzi, '丙子'); // 子时 stem from the new 乙 day stem
+  });
+
+  it('starts every hour branch at its boundary minute and not one minute before', () => {
+    // Branch b starts at (b * 120 - 60) mod 1440: 子 23:00, 丑 01:00, …, 亥 21:00.
+    // Day stem 甲, so the Five Rats rule gives stem index b mod 10 for each branch.
+    const mod = (n: number, m: number): number => ((n % m) + m) % m;
+    for (let b = 0; b < 12; b++) {
+      const start = mod(b * 120 - 60, 1440);
+      const at = hourPillar(0, start);
+      assert.equal(at.branch, b, `branch ${b} starts at minute ${start}`);
+      assert.equal(at.stem, b % 10, `branch ${b} stem follows the Five Rats rule`);
+      const before = hourPillar(0, mod(start - 1, 1440));
+      assert.equal(before.branch, mod(b - 1, 12), `minute ${start - 1} is still the previous branch`);
+    }
   });
 
   it('switches the hour branch at exactly 01:00 (子 → 丑) without rolling the day', () => {
