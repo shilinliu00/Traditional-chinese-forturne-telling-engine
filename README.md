@@ -22,7 +22,11 @@ bazi-calculator/
 │       │   ├── pillars.ts     # Year/month/day/hour pillar calculation
 │       │   ├── luckPillars.ts # Luck pillars (大运) + annual pillars (流年)
 │       │   ├── reading.ts     # Chart readings: Ten Gods, NaYin, hidden-stem gods
-│       │   ├── rules.ts       # Structural rules (合/冲/害) with evidence + classical sources
+│       │   ├── rules.ts       # Structural rules (合/冲/刑/害/破) with evidence + classical sources
+│       │   ├── strength.ts    # Day Master strength (旺衰) scoring with evidence
+│       │   ├── favorable.ts   # Favorable elements (喜用神/忌神) + seasonal 调候
+│       │   ├── personality.ts # Top Ten God temperaments, modulated by strength
+│       │   ├── share.ts       # Share-link encode/decode with validation
 │       │   └── index.ts       # Public API
 │       └── tests/
 └── apps/
