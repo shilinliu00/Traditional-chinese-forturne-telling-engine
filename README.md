@@ -123,7 +123,7 @@ current form inputs.
 
 ## Accuracy notes (honest)
 
-- Solar-term instants are computed astronomically and validated against the National Astronomical Observatory of Japan's published almanac: all 24 terms of 2024 land within 8 minutes of the published instants (typical error 1–6 minutes); 2025 Lichun is within 2 minutes. Births within ~10 minutes of a term boundary should still be double-checked.
+- Solar-term instants are computed astronomically and validated against the National Astronomical Observatory of Japan's published almanac: all 24 terms of 2024 land within 8 minutes of the published instants (typical error 1–6 minutes); 2025 Lichun is within 2 minutes. The 2026 Lichun instant (the current year's year-pillar boundary) lands within 7 minutes of the published Skyfield table value (2026-02-03 20:02 UTC). Births within ~10 minutes of a term boundary should still be double-checked.
 - True solar time corrects for longitude (1° = 4 min) and the equation of time (full Meeus ch. 28, < 0.01 min error; checked against published anchors Feb 11 −14.2, May 14 +3.7, Jul 26 −6.4, Nov 3 +16.4 min). Correction applies when a birthplace longitude is supplied; without one, clock time is used as-is.
 
 ## Roadmap
