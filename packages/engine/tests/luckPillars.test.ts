@@ -101,7 +101,7 @@ describe('annual pillars', () => {
     // The web UI renders the flowing year as annualPillar(baziYearAt(now));
     // it must agree with yearPillarAt at every instant, especially around
     // the Lichun boundary where the BaZi year rolls over.
-    for (const y of [1999, 2000, 2023, 2024, 2025]) {
+    for (const y of [1999, 2000, 2023, 2024, 2025, 2026, 2027]) {
       for (const d of [`${y}-01-15T00:00:00Z`, `${y}-02-03T12:00:00Z`, `${y}-02-05T00:00:00Z`, `${y}-06-01T00:00:00Z`]) {
         const t = new Date(d);
         assert.equal(
