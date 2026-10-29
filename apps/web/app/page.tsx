@@ -496,7 +496,10 @@ export default function Home() {
                 return (
                   <div key={i} className={`luck-item${current ? ' current' : ''}`}>
                     <div className="hanzi">{lp.hanzi}</div>
-                    <div className="age">{t.fromYears} {lp.startAge.toFixed(1)} {t.years}</div>
+                    <div className="age">
+                      {t.fromYears} {lp.startAge.toFixed(1)} {t.years}
+                      {next ? ` – ${next.startAge.toFixed(1)} ${t.years}` : ''}
+                    </div>
                     <div className="god">{tenGod(result.chart.dayMaster, lp.stem)}</div>
                     <div className="nayin">纳音 {nayinOf(lp.stem, lp.branch).name}</div>
                     <div className="hidden-stems">
