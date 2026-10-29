@@ -136,4 +136,20 @@ describe('favorableElements', () => {
     assert.equal(r.seasonal.element, 'Water');
     assert.ok(r.seasonal.reason.includes('未'));
   });
+
+  it('chen you xu months have no seasonal need', () => {
+    // The remaining untested branches: 辰 (spring end, Earth main qi),
+    // 酉 (autumn, Metal main qi), 戌 (autumn end, Earth main qi). None
+    // is a cold or hot season branch, and neither season end special
+    // case (丑 winter, 未 summer) applies to them.
+    for (const [branch, hanzi] of [[4, '辰'], [9, '酉'], [10, '戌']] as const) {
+      const c = chart(
+        [[1, 0], [2, branch], [0, 3], [8, 3]],
+        0,
+      );
+      const r = favorableElements(c);
+      assert.equal(r.seasonal.element, null, `${hanzi} month`);
+      assert.ok(r.seasonal.reason.includes(hanzi));
+    }
+  });
 });
