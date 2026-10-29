@@ -6,7 +6,7 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { calculateBaZi, dayPillarIndex, baziYearAt, hourPillar } from '../src/pillars.ts';
-import { lichunInstant, solarTermInstant, jieBranchAt } from '../src/solarTerms.ts';
+import { lichunInstant, solarTermInstant, jieBranchAt, jieTermInstants } from '../src/solarTerms.ts';
 
 describe('term boundaries', () => {
   it('year pillar switches exactly at the Lichun instant (2024-02-04 08:21 UTC)', () => {
@@ -38,6 +38,20 @@ describe('term boundaries', () => {
     // Direct instant-level check: the boundary is inclusive at the instant.
     assert.equal(jieBranchAt(new Date(instant.getTime() - 1)), 2);
     assert.equal(jieBranchAt(instant), 3);
+  });
+
+  it('every jie term of 2024 switches the month branch at its instant', () => {
+    // Generalizes the Jingzhe check above: month branches step through
+    // 寅卯辰巳午未申酉戌亥子丑 in order, so the branch just before each
+    // Jie instant is the previous one in that cycle.
+    const terms = jieTermInstants(2024);
+    assert.equal(terms.length, 12);
+    for (const { term, instant } of terms) {
+      assert.ok(term.branch !== undefined, term.name);
+      const branch = term.branch;
+      assert.equal(jieBranchAt(new Date(instant.getTime() - 1)), (branch + 11) % 12, term.name);
+      assert.equal(jieBranchAt(instant), branch, term.name);
+    }
   });
 });
 
