@@ -44,6 +44,24 @@ describe('four pillars', () => {
     assert.equal(after.month.hanzi, '丙寅');
   });
 
+  it('steps month stems through the five tigers rule for a yi year', () => {
+    // BaZi year 2025 is 乙巳, so the five tigers rule starts the year at
+    // 戊寅 and steps one stem per month: 戊寅 己卯 庚辰 辛巳 壬午 癸未
+    // 甲申 乙酉 丙戌 丁亥 戊子 己丑. Mid-month dates keep every sample
+    // clear of the jie boundaries.
+    const expected = [
+      ['2025-02-15', '戊寅'], ['2025-03-15', '己卯'], ['2025-04-15', '庚辰'],
+      ['2025-05-15', '辛巳'], ['2025-06-15', '壬午'], ['2025-07-15', '癸未'],
+      ['2025-08-15', '甲申'], ['2025-09-15', '乙酉'], ['2025-10-15', '丙戌'],
+      ['2025-11-15', '丁亥'], ['2025-12-15', '戊子'], ['2026-01-15', '己丑'],
+    ];
+    for (const [date, month] of expected) {
+      const c = calculateBaZi({ date, time: '12:00', utcOffsetMinutes: 0 });
+      assert.equal(c.year.hanzi, '乙巳', date);
+      assert.equal(c.month.hanzi, month, date);
+    }
+  });
+
   it('rolls the day over at 23:00 (late 子时 belongs to the next day)', () => {
     const c = calculateBaZi({ date: '2024-01-01', time: '23:30' });
     assert.equal(c.day.hanzi, '乙丑');
