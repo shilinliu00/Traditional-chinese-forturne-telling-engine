@@ -78,6 +78,20 @@ describe('rule evaluation', () => {
     assert.equal(h.source, '《三命通会》');
   });
 
+  it('reports one 自刑 hit covering all three pillars when a branch repeats thrice', () => {
+    // 甲辰 / 乙辰 / 丙辰 / 丁寅 → a single 辰自刑 hit listing year, month
+    // and day, not one hit per repeated pair (寅 dodges every other
+    // pair relation; stems form no 五合 or 相冲).
+    const hits = evaluateRules(chart([[0, 4], [1, 4], [2, 4], [3, 2]]));
+    assert.equal(hits.length, 1);
+    const [h] = hits;
+    assert.equal(h.rule, 'branch-punishment');
+    assert.equal(h.pattern, '辰自刑');
+    assert.deepEqual(h.pillars, ['year', 'month', 'day']);
+    assert.deepEqual(h.factors, ['年支辰', '月支辰', '日支辰']);
+    assert.equal(h.source, '《三命通会》');
+  });
+
   it('a single 辰 with no repeat is not 自刑', () => {
     // 甲辰 / 乙寅 / 丙寅 / 丁寅 → no hits
     const hits = evaluateRules(chart([[0, 4], [1, 2], [2, 2], [3, 2]]));
