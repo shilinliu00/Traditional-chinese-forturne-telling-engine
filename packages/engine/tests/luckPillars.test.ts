@@ -51,6 +51,21 @@ describe('luck pillars', () => {
     assert.ok(Math.abs(luck[0].startAge - 9.05) < 0.1, `startAge=${luck[0].startAge}`);
   });
 
+  it('pins the exact backward start age from the previous jie', () => {
+    // Female born 2024-06-15 12:00 UTC: 阳女 → backward, month pillar 庚午.
+    // Previous Jie is 芒种 2024-06-05 ~04:06 UTC, so the first pillar starts
+    // at (10d 7h54m) / 3 = 3.44 years, pinned exactly, not within tolerance.
+    const luck = luckPillars(
+      { date: '2024-06-15', time: '12:00', utcOffsetMinutes: 0, gender: 'female' },
+      2,
+    );
+    assert.equal(luck[0].direction, 'backward');
+    assert.equal(luck[0].hanzi, '己巳');
+    assert.equal(luck[0].startAge, 3.44);
+    assert.equal(luck[1].hanzi, '戊辰');
+    assert.equal(luck[1].startAge, 13.44);
+  });
+
   it('generates 8 pillars by default with 10-year steps', () => {
     const luck = luckPillars(maleInput);
     assert.equal(luck.length, 8);
