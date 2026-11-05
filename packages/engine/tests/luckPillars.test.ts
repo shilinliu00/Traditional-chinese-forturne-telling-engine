@@ -79,6 +79,8 @@ describe('luck pillars', () => {
 
   it('rejects invalid counts', () => {
     assert.throws(() => luckPillars(maleInput, 0), /positive integer/);
+    assert.throws(() => luckPillars(maleInput, -2), /positive integer/);
+    assert.throws(() => luckPillars(maleInput, 2.5), /positive integer/);
   });
 
   it('start ages stay within the 3 days 1 year scale across the year', () => {
@@ -110,6 +112,11 @@ describe('annual pillars', () => {
     assert.equal(annualPillar(2025).hanzi, '乙巳');
     assert.equal(annualPillar(2023).hanzi, '癸卯');
     assert.equal(annualPillar(2000).hanzi, '庚辰');
+  });
+
+  it('rejects a non integer year', () => {
+    assert.throws(() => annualPillar(2024.5), /must be an integer/);
+    assert.throws(() => annualPillar(NaN), /must be an integer/);
   });
 
   it('annualPillar(baziYearAt(t)) always matches the chart year pillar', () => {
