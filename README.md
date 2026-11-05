@@ -119,7 +119,7 @@ current form inputs.
 - **Personality mapping (性格)**: `personalityTraits()` tallies the most frequent Ten Gods across the four pillar stems and every hidden stem, with keyword temperaments from the `TEN_GOD_INFO` table; the Day Master strength verdict modulates expression (身旺 → 外放, 身弱 → 内敛, 中和 → 平和). Shown in the web UI.
 - **Structural rules (合/冲/刑/害/破)**: `evaluateRules()` detects 天干五合, 天干相冲, 地支六合, 三合局, 三会方, 半合局 (the 生旺/旺墓 branch pairs of a 三合局, e.g. 申子/子辰半合水局 — a complete triple suppresses its pairs, and a 生/墓 pair without the 旺 branch is not counted), 六冲, 六害, 六破 (子酉破 etc.), and 三刑 (寅巳申/丑戌未 triple punishments, 子卯相刑, 辰午酉亥自刑) across the four pillars; every hit records its evidence (triggering pillars, human-readable factors) and the classical source (《三命通会》), keeping interpretation separate from calculation.
 - **Luck pillars (大运)**: direction from year-stem polarity × gender (阳男/阴女顺行, 阴男/阳女逆行); start age from birth-to-neighboring-Jie days ÷ 3 (三天折合一岁), fractional. Shown in the web UI alongside each pillar's Ten God and NaYin.
-- **Annual pillar (流年)**: the flowing year's ganzhi (the BaZi year begins at Lichun).
+- **Annual pillar (流年)**: the flowing year's ganzhi (the BaZi year begins at Lichun). The web UI shows the current year by default and lets you pick any year to inspect its pillar, Ten God, NaYin, and hidden stems.
 
 ## Accuracy notes (honest)
 
@@ -138,3 +138,4 @@ current form inputs.
 - [x] Next.js web app: chart UI, element-balance visualizations (English UI with hanzi/pinyin labels)
 - [x] Bilingual EN/中文 UI toggle: full STR dictionary in `apps/web/app/page.tsx` covers headings, form labels, and all card body text
 - [x] Shareable chart links: birth inputs encoded as URL query params (`encodeShareParams`/`decodeShareParams` in `packages/engine/src/share.ts` with validation tests), pre-filled + auto-run on load, "Copy share link" button in the web UI
+- [x] Annual pillar year picker in the web UI: inspect any year's 流年 pillar, Ten God, NaYin, and hidden stems (defaults to the current BaZi year)
