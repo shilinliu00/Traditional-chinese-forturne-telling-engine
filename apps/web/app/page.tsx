@@ -27,7 +27,6 @@ import {
   type RuleHit,
   type Gender,
   type LuckPillar,
-  type Pillar,
   type Element,
   type StrengthResult,
   type FavorableResult,
@@ -68,6 +67,7 @@ const STR: Record<Lang, Record<string, string>> = {
     forward: '顺行 forward',
     backward: '逆行 backward',
     annual: 'Annual pillar 流年',
+    inspectYear: 'Year to inspect',
     pillarYear: 'Year 年柱',
     pillarMonth: 'Month 月柱',
     pillarDay: 'Day 日柱',
@@ -85,7 +85,6 @@ const STR: Record<Lang, Record<string, string>> = {
     years: 'yrs',
     luckNote: 'Start ages use the 三天折合一岁 rule (3 days = 1 year) from the birth moment to the neighboring Jie (节) term instant.',
     vsDayMaster: 'vs Day Master',
-    flowingYear: 'flowing year',
     annualNote: 'The flowing year begins at Lichun (立春), not January 1.',
     pageNote: 'Year and month pillars switch at astronomical solar-term instants (computed from the sun\'s apparent ecliptic longitude, accurate to a few minutes). Day and hour pillars use true local solar time from birthplace longitude: the longitude meridian correction plus the equation of time (up to ±16 minutes, Meeus ch. 28) both apply.',
   },
@@ -115,6 +114,7 @@ const STR: Record<Lang, Record<string, string>> = {
     forward: '顺行',
     backward: '逆行',
     annual: '流年',
+    inspectYear: '查看年份',
     pillarYear: '年柱',
     pillarMonth: '月柱',
     pillarDay: '日柱',
@@ -132,7 +132,6 @@ const STR: Record<Lang, Record<string, string>> = {
     years: '岁起',
     luckNote: '起运年龄按三天折合一岁，从出生时刻到相邻节令推算。',
     vsDayMaster: '对日主',
-    flowingYear: '流年',
     annualNote: '流年从立春开始，不是从1月1日。',
     pageNote: '年柱与月柱按天文节气时刻切换（由太阳视黄经计算，误差数分钟）。日柱与时柱使用出生地经度换算的真太阳时：经度时差校正加均时差（最大约±16分钟，Meeus 第28章）两者都适用。',
   },
@@ -281,8 +280,9 @@ export default function Home() {
   const [utcOffset, setUtcOffset] = useState('8');
   const [longitude, setLongitude] = useState('120');
   const [gender, setGender] = useState<Gender>('male');
+  const [annualYear, setAnnualYear] = useState(String(baziYearAt(new Date())));
   const [result, setResult] = useState<{
-    chart: BaZiChart; reading: ChartReading; structure: RuleHit[]; luck: LuckPillar[]; annual: Pillar; flowYear: number; ageYears: number;
+    chart: BaZiChart; reading: ChartReading; structure: RuleHit[]; luck: LuckPillar[]; ageYears: number;
     strength: StrengthResult; favorable: FavorableResult; personality: PersonalityTrait[];
   } | null>(null);
   const [error, setError] = useState('');
@@ -304,11 +304,9 @@ export default function Home() {
       const favorable: FavorableResult = favorableElements(chart);
       const personality: PersonalityTrait[] = personalityTraits(reading, strength.verdict);
       const now = new Date();
-      const flowYear = baziYearAt(now);
-      const annual = annualPillar(flowYear);
       const ageYears = (now.getTime() - birthInstantUtc(input).getTime()) / 31_557_600_000;
       setError('');
-      setResult({ chart, reading, structure, luck, annual, flowYear, ageYears, strength, favorable, personality });
+      setResult({ chart, reading, structure, luck, ageYears, strength, favorable, personality });
     } catch (err) {
       setResult(null);
       setError(err instanceof Error ? err.message : String(err));
@@ -377,6 +375,14 @@ export default function Home() {
         .map((g) => ({ god: g, count: countTenGods(result.reading)[g] }))
         .filter((x) => x.count > 0)
     : [];
+
+  // The annual pillar shown below follows the picked year, not just the
+  // current flowing year; a bad year falls back to the current BaZi year.
+  const inspectedYear = (() => {
+    const n = Number(annualYear);
+    return Number.isInteger(n) ? n : baziYearAt(new Date());
+  })();
+  const inspectedAnnual = annualPillar(inspectedYear);
 
   return (
     <>
@@ -519,20 +525,27 @@ export default function Home() {
 
           <div className="card">
             <h2>{t.annual}</h2>
+            <div className="field" style={{ maxWidth: '12rem' }}>
+              <label>{t.inspectYear}</label>
+              <input
+                type="number" step="1"
+                value={annualYear} onChange={(e) => setAnnualYear(e.target.value)}
+              />
+            </div>
             <p style={{ fontSize: '1.5rem', fontWeight: 700, margin: '0.25rem 0' }}>
-              {result.annual.hanzi}{' '}
+              {inspectedAnnual.hanzi}{' '}
               <span style={{ fontSize: '0.9rem', fontWeight: 400, color: 'var(--muted)' }}>
-                {STEMS[result.annual.stem].pinyin} {BRANCHES[result.annual.branch].pinyin} · {t.flowingYear} {result.flowYear}
+                {STEMS[inspectedAnnual.stem].pinyin} {BRANCHES[inspectedAnnual.branch].pinyin} · {inspectedYear}
               </span>
             </p>
             <p className="meta">
-              {tenGod(result.chart.dayMaster, result.annual.stem)}{' '}
-              {TEN_GOD_INFO[tenGod(result.chart.dayMaster, result.annual.stem)].english} {t.vsDayMaster} · 纳音{' '}
-              {nayinOf(result.annual.stem, result.annual.branch).name}
+              {tenGod(result.chart.dayMaster, inspectedAnnual.stem)}{' '}
+              {TEN_GOD_INFO[tenGod(result.chart.dayMaster, inspectedAnnual.stem)].english} {t.vsDayMaster} · 纳音{' '}
+              {nayinOf(inspectedAnnual.stem, inspectedAnnual.branch).name}
             </p>
             <p className="meta">
               藏干{' '}
-              {BRANCHES[result.annual.branch].hiddenStems.map((s) => (
+              {BRANCHES[inspectedAnnual.branch].hiddenStems.map((s) => (
                 <span key={s}>
                   <b>{STEMS[s].hanzi}</b> {tenGod(result.chart.dayMaster, s)}{' '}
                 </span>
