@@ -24,6 +24,21 @@ describe('term boundaries', () => {
     assert.equal(after.year.hanzi, '甲辰');
   });
 
+  it('year pillar switches exactly at the 2026 Lichun instant (2026-02-03 19:55 UTC)', () => {
+    const instant = lichunInstant(2026);
+    assert.ok(instant.toISOString().startsWith('2026-02-03T19:55'));
+    // One minute before: still BaZi year 2025 (乙巳年).
+    const before = calculateBaZi({
+      date: '2026-02-03', time: '19:54', utcOffsetMinutes: 0,
+    });
+    assert.equal(before.year.hanzi, '乙巳');
+    // One minute after the instant's minute: BaZi year 2026 (丙午年).
+    const after = calculateBaZi({
+      date: '2026-02-03', time: '19:56', utcOffsetMinutes: 0,
+    });
+    assert.equal(after.year.hanzi, '丙午');
+  });
+
   it('month branch switches exactly at the Jingzhe instant (寅 → 卯)', () => {
     const instant = solarTermInstant(2024, 2).instant; // 惊蛰 opens 卯 month
     assert.ok(instant.toISOString().startsWith('2024-03-05T02:16'));
