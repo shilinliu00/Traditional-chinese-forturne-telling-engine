@@ -93,6 +93,15 @@ describe('favorableElements', () => {
     const r = favorableElements(hotWu);
     assert.equal(r.seasonal.element, 'Water');
     assert.ok(r.seasonal.reason.includes('炎热'));
+    // 巳's main qi is Fire (丙), so the main qi check alone catches it —
+    // unlike 未, which needs the summer end special case below.
+    const hotSi = chart(
+      [[1, 0], [2, 5], [0, 3], [8, 3]],
+      0,
+    );
+    const rSi = favorableElements(hotSi);
+    assert.equal(rSi.seasonal.element, 'Water');
+    assert.ok(rSi.seasonal.reason.includes('巳'));
   });
 
   it('mild-season month branch (卯) has no seasonal need', () => {
