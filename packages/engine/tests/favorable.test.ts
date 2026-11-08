@@ -161,4 +161,17 @@ describe('favorableElements', () => {
       assert.ok(r.seasonal.reason.includes(hanzi));
     }
   });
+
+  it('yin month (寅) has no seasonal need', () => {
+    // The last unpinned branch: 寅's main qi is Wood (甲), spring, so
+    // neither the cold nor the hot rule fires. With this, all twelve
+    // month branches have an explicit seasonal expectation.
+    const mildYin = chart(
+      [[1, 0], [2, 2], [0, 3], [8, 3]],
+      0,
+    );
+    const r = favorableElements(mildYin);
+    assert.equal(r.seasonal.element, null);
+    assert.ok(r.seasonal.reason.includes('寅'));
+  });
 });
