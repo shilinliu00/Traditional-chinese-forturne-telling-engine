@@ -3,9 +3,9 @@
  * Observatory of Japan's published 2024/2025 almanac values
  * (https://eco.mtk.nao.ac.jp/koyomi/yoko/), converted from JST (UTC+9)
  * to UTC. The engine's astronomical computation lands within ~8 minutes
- * of these (typically 1–6); tests allow 15 minutes. The 2026 Lichun
- * reference comes from the published Lichun table (Skyfield ephemeris
- * for 2021–2030), also in UTC.
+ * of these (typically 1–6); tests allow 15 minutes. The 2026 and 2027
+ * Lichun references come from the published Lichun table (Skyfield
+ * ephemeris for 2021–2030), also in UTC.
  */
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
@@ -59,6 +59,13 @@ describe('solar terms', () => {
     // on Feb 4, matching the widely published Feb 4 04:01–04:02 local time).
     // This is the current year boundary the live demo's year pillar turns on.
     assertCloseTo(lichunInstant(2026), Date.UTC(2026, 1, 3, 20, 2), '2026 Lichun');
+  });
+
+  it('matches the published 2027 Lichun instant', () => {
+    // 立春 2027-02-04 01:46 UTC (Skyfield table value; 09:46 Beijing time,
+    // matching the Hong Kong Observatory February 2027 almanac).
+    // Next year's boundary the live demo's year pillar turns on.
+    assertCloseTo(lichunInstant(2027), Date.UTC(2027, 1, 4, 1, 46), '2027 Lichun');
   });
 
   it('returns the 12 Jie terms of a year in calendar order', () => {
