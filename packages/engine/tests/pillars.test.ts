@@ -62,6 +62,25 @@ describe('four pillars', () => {
     }
   });
 
+  it('starts the five tigers rule at the right stem for every year stem group', () => {
+    // The 寅月 stem depends only on the year stem group (五虎遁):
+    // 甲/己 → 丙寅, 乙/庚 → 戊寅, 丙/辛 → 庚寅, 丁/壬 → 壬寅,
+    // 戊/癸 → 甲寅. One mid February sample per year stem, 2024–2033,
+    // covers all ten stems and all five groups.
+    const expected = [
+      ['2024-02-15', '甲辰', '丙寅'], ['2025-02-15', '乙巳', '戊寅'],
+      ['2026-02-15', '丙午', '庚寅'], ['2027-02-15', '丁未', '壬寅'],
+      ['2028-02-15', '戊申', '甲寅'], ['2029-02-15', '己酉', '丙寅'],
+      ['2030-02-15', '庚戌', '戊寅'], ['2031-02-15', '辛亥', '庚寅'],
+      ['2032-02-15', '壬子', '壬寅'], ['2033-02-15', '癸丑', '甲寅'],
+    ];
+    for (const [date, year, month] of expected) {
+      const c = calculateBaZi({ date, time: '12:00', utcOffsetMinutes: 0 });
+      assert.equal(c.year.hanzi, year, date);
+      assert.equal(c.month.hanzi, month, date);
+    }
+  });
+
   it('rolls the day over at 23:00 (late 子时 belongs to the next day)', () => {
     const c = calculateBaZi({ date: '2024-01-01', time: '23:30' });
     assert.equal(c.day.hanzi, '乙丑');
