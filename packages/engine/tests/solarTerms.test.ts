@@ -5,7 +5,9 @@
  * to UTC. The engine's astronomical computation lands within ~8 minutes
  * of these (typically 1–6); tests allow 15 minutes. The 2026 and 2027
  * Lichun references come from the published Lichun table (Skyfield
- * ephemeris for 2021–2030), also in UTC.
+ * ephemeris for 2021–2030), also in UTC. The 2028 Lichun reference is
+ * 15:31 Beijing time (07:31 UTC) on Feb 4, per the Hong Kong Observatory
+ * almanac and the Astronomy Engine solar term table.
  */
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
@@ -66,6 +68,14 @@ describe('solar terms', () => {
     // matching the Hong Kong Observatory February 2027 almanac).
     // Next year's boundary the live demo's year pillar turns on.
     assertCloseTo(lichunInstant(2027), Date.UTC(2027, 1, 4, 1, 46), '2027 Lichun');
+  });
+
+  it('matches the published 2028 Lichun instant', () => {
+    // 立春 2028-02-04 07:31 UTC (15:31 Beijing time, per the Hong Kong
+    // Observatory February 2028 almanac and the Astronomy Engine solar
+    // term table; the 立春 table lists 07:30 UT to the minute).
+    // The 2028 boundary the live demo's year pillar turns on.
+    assertCloseTo(lichunInstant(2028), Date.UTC(2028, 1, 4, 7, 31), '2028 Lichun');
   });
 
   it('returns the 12 Jie terms of a year in calendar order', () => {
