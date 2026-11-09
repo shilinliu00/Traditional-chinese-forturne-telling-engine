@@ -81,6 +81,25 @@ describe('four pillars', () => {
     }
   });
 
+  it('steps the five tigers rule one stem on into the mao month for every year stem group', () => {
+    // The 卯月 stem is the 寅月 stem stepped one on (五虎遁): 甲/己 →
+    // 丁卯, 乙/庚 → 己卯, 丙/辛 → 辛卯, 丁/壬 → 癸卯, 戊/癸 → 乙卯.
+    // One mid March sample per year stem, 2024–2033, covers all ten
+    // stems and checks the month order stepping, not just the start.
+    const expected = [
+      ['2024-03-15', '甲辰', '丁卯'], ['2025-03-15', '乙巳', '己卯'],
+      ['2026-03-15', '丙午', '辛卯'], ['2027-03-15', '丁未', '癸卯'],
+      ['2028-03-15', '戊申', '乙卯'], ['2029-03-15', '己酉', '丁卯'],
+      ['2030-03-15', '庚戌', '己卯'], ['2031-03-15', '辛亥', '辛卯'],
+      ['2032-03-15', '壬子', '癸卯'], ['2033-03-15', '癸丑', '乙卯'],
+    ];
+    for (const [date, year, month] of expected) {
+      const c = calculateBaZi({ date, time: '12:00', utcOffsetMinutes: 0 });
+      assert.equal(c.year.hanzi, year, date);
+      assert.equal(c.month.hanzi, month, date);
+    }
+  });
+
   it('rolls the day over at 23:00 (late 子时 belongs to the next day)', () => {
     const c = calculateBaZi({ date: '2024-01-01', time: '23:30' });
     assert.equal(c.day.hanzi, '乙丑');
