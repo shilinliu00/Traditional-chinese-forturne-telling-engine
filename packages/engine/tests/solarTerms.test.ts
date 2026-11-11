@@ -7,7 +7,9 @@
  * Lichun references come from the published Lichun table (Skyfield
  * ephemeris for 2021–2030), also in UTC. The 2028 Lichun reference is
  * 15:31 Beijing time (07:31 UTC) on Feb 4, per the Hong Kong Observatory
- * almanac and the Astronomy Engine solar term table.
+ * almanac and the Astronomy Engine solar term table. The 2029 Lichun
+ * reference is 13:20 UT on Feb 3, per the 立春 instant table and
+ * 21:20 Beijing time per the Hong Kong Observatory sourced calendar.
  */
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
@@ -76,6 +78,13 @@ describe('solar terms', () => {
     // term table; the 立春 table lists 07:30 UT to the minute).
     // The 2028 boundary the live demo's year pillar turns on.
     assertCloseTo(lichunInstant(2028), Date.UTC(2028, 1, 4, 7, 31), '2028 Lichun');
+  });
+
+  it('matches the published 2029 Lichun instant', () => {
+    // 立春 2029-02-03 13:20 UTC (21:20 Beijing time, per the 立春
+    // instant table and the Hong Kong Observatory sourced calendar).
+    // The 2029 boundary the live demo's year pillar turns on.
+    assertCloseTo(lichunInstant(2029), Date.UTC(2029, 1, 3, 13, 20), '2029 Lichun');
   });
 
   it('returns the 12 Jie terms of a year in calendar order', () => {
