@@ -10,6 +10,10 @@
  * almanac and the Astronomy Engine solar term table. The 2029 Lichun
  * reference is 13:20 UT on Feb 3, per the 立春 instant table and
  * 21:20 Beijing time per the Hong Kong Observatory sourced calendar.
+ * The 2030 Lichun reference is 19:08 UT on Feb 3 (04:08 JST Feb 4
+ * per the NAOJ long term table, 03:08 Beijing time per the Hong Kong
+ * Observatory sourced calendar; the Astronomy Engine solar term
+ * table agrees).
  */
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
@@ -85,6 +89,14 @@ describe('solar terms', () => {
     // instant table and the Hong Kong Observatory sourced calendar).
     // The 2029 boundary the live demo's year pillar turns on.
     assertCloseTo(lichunInstant(2029), Date.UTC(2029, 1, 3, 13, 20), '2029 Lichun');
+  });
+
+  it('matches the published 2030 Lichun instant', () => {
+    // 立春 2030-02-03 19:08 UTC (04:08 JST Feb 4 per NAOJ, 03:08 Beijing
+    // time per the Hong Kong Observatory sourced calendar, and the
+    // Astronomy Engine solar term table lists 19:08 UTC).
+    // The 2030 boundary the live demo's year pillar turns on.
+    assertCloseTo(lichunInstant(2030), Date.UTC(2030, 1, 3, 19, 8), '2030 Lichun');
   });
 
   it('returns the 12 Jie terms of a year in calendar order', () => {
