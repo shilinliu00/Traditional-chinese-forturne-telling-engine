@@ -222,6 +222,19 @@ describe('term boundaries', () => {
       assert.equal(jieBranchAt(instant), branch, term.name);
     }
   });
+
+  it('every jie term of 2031 switches the month branch at its instant', () => {
+    // Same check for 2031, a non-leap year: the solver's day-of-year
+    // approximations must not drift the boundary in an eighth year.
+    const terms = jieTermInstants(2031);
+    assert.equal(terms.length, 12);
+    for (const { term, instant } of terms) {
+      assert.ok(term.branch !== undefined, term.name);
+      const branch = term.branch;
+      assert.equal(jieBranchAt(new Date(instant.getTime() - 1)), (branch + 11) % 12, term.name);
+      assert.equal(jieBranchAt(instant), branch, term.name);
+    }
+  });
 });
 
 describe('baziYearAt', () => {
