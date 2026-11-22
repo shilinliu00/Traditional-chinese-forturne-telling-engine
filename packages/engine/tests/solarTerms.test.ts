@@ -20,6 +20,9 @@
  * The 2032 Lichun reference is 06:49 UT on Feb 4 (14:49 Beijing
  * time per the Wikipedia Lichun table and other almanacs; some
  * almanacs list 14:48 Beijing time).
+ * The 2033 Lichun reference is 12:42 UT on Feb 3 (20:42 Beijing
+ * time per the Wikipedia Lichun table; some almanacs list 20:41
+ * Beijing time).
  */
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
@@ -118,6 +121,13 @@ describe('solar terms', () => {
     // Lichun table and other almanacs; some almanacs list 14:48).
     // The 2032 boundary the live demo's year pillar turns on.
     assertCloseTo(lichunInstant(2032), Date.UTC(2032, 1, 4, 6, 49), '2032 Lichun');
+  });
+
+  it('matches the published 2033 Lichun instant', () => {
+    // 立春 2033-02-03 12:42 UTC (20:42 Beijing time per the Wikipedia
+    // Lichun table; some almanacs list 20:41).
+    // The 2033 boundary the live demo's year pillar turns on.
+    assertCloseTo(lichunInstant(2033), Date.UTC(2033, 1, 3, 12, 42), '2033 Lichun');
   });
 
   it('returns the 12 Jie terms of a year in calendar order', () => {
